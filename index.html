@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur Retraite</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;700;800&family=Montserrat:wght@500;600;700;800&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="tooltip" id="tooltip"></div>
+<div class="container app-shell">
+  <div class="app-main">
+  <header>
+    <div class="header-content">
+      <div class="header-label">// simulateur financier</div>
+      <h1>Épargne <em>Retraite</em></h1>
+      <p class="subtitle">Vos placements continuent de croître même après le début des retraits.</p>
+    </div>
+    <div class="theme-toggle" id="themeToggle">
+      <span class="theme-toggle-label" id="themeLabel">Sombre</span>
+      <div class="theme-toggle-switch"></div>
+    </div>
+  </header>
+
+  <div class="form-card">
+
+    <div class="section-title"><span class="section-number">1</span>Profil personnel</div>
+    <div class="grid-3" style="margin-bottom:20px">
+      <div class="field">
+        <label>Âge actuel</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="currentAge" value="25" min="15" max="80"><span class="input-unit">ans</span></div>
+      </div>
+      <div class="field">
+        <label>Âge de retraite</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="retirementAge" value="60" min="40" max="85"><span class="input-unit">ans</span></div>
+        <span class="field-hint">Début des retraits sur le capital</span>
+      </div>
+      <div class="field">
+        <label>Espérance de vie</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="endAge" value="90" min="60" max="110"><span class="input-unit">ans</span></div>
+      </div>
+    </div>
+
+
+    <div class="section-title"><span class="section-number">2</span>Épargne &amp; cotisations</div>
+    <div class="account-grid" style="margin-bottom:20px">
+      <div class="account-panel">
+        <div class="account-panel-head"><span class="account-badge">A</span><span class="account-panel-title">CELI</span></div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Solde initial</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="celiInitialAmount" value="2000" min="0"><span class="input-unit">$</span></div>
+          </div>
+          <div class="field">
+            <label>Cotisation annuelle souhaitée</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="celiAnnualContrib" value="3000" min="0"><span class="input-unit">$/an</span></div>
+          </div>
+          <div class="field-separator">
+            <span>Limites de cotisation</span>
+            <div class="limit-toggle" role="radiogroup" aria-label="Appliquer les limites CELI">
+              <label><input type="radio" name="celiLimitMode" value="yes"><span>Oui</span></label>
+              <label><input type="radio" name="celiLimitMode" value="no" checked><span>Non</span></label>
+            </div>
+          </div>
+          <div class="limit-fields" id="celiLimitFields">
+            <div class="field">
+              <label>Droits CELI disponibles</label>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="celiRoomAvailable" value="10000" min="0"><span class="input-unit">$</span></div>
+            </div>
+            <div class="field">
+              <label>Limite annuelle CELI</label>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="celiAnnualLimit" value="7000" min="0"><span class="input-unit">$/an</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="account-panel">
+        <div class="account-panel-head"><span class="account-badge">B</span><span class="account-panel-title">REER</span></div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Solde initial</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="reerInitialAmount" value="2000" min="0"><span class="input-unit">$</span></div>
+          </div>
+          <div class="field">
+            <label>Cotisation annuelle souhaitée</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="reerAnnualContrib" value="2000" min="0"><span class="input-unit">$/an</span></div>
+          </div>
+          <div class="field-separator">
+            <span>Limites de cotisation</span>
+            <div class="limit-toggle" role="radiogroup" aria-label="Appliquer les limites REER">
+              <label><input type="radio" name="reerLimitMode" value="yes"><span>Oui</span></label>
+              <label><input type="radio" name="reerLimitMode" value="no" checked><span>Non</span></label>
+            </div>
+          </div>
+          <div class="limit-fields" id="reerLimitFields">
+            <div class="field">
+              <label>Revenu annuel brut</label>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerIncome" value="70000" min="0"><span class="input-unit">$/an</span></div>
+            </div>
+            <div class="field">
+              <label>Droits REER disponibles</label>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerRoomAvailable" value="15000" min="0"><span class="input-unit">$</span></div>
+            </div>
+            <div class="field">
+              <label>Taux de droit REER</label>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerRoomRate" value="18" min="0" max="100" step="0.1"><span class="input-unit">%</span></div>
+            </div>
+            <div class="field">
+              <label>Plafond annuel REER</label>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerAnnualCap" value="33000" min="0"><span class="input-unit">$/an</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="account-panel">
+        <div class="account-panel-head"><span class="account-badge">C</span><span class="account-panel-title">Compte non enregistré</span></div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Solde initial</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="nonRegInitialAmount" value="1000" min="0"><span class="input-unit">$</span></div>
+          </div>
+          <div class="field">
+            <label>Cotisation annuelle souhaitée</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="nonRegAnnualContrib" value="1000" min="0"><span class="input-unit">$/an</span></div>
+          </div>
+          <div class="field-separator muted" aria-hidden="true"><span>Limites de cotisation non applicables</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box blue">
+      Les limites CELI/REER peuvent etre actives (Oui) ou desactivees (Non). En mode Oui, les cotisations sont plafonnees automatiquement et les depassements sont signales dans la section problemes.
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="field">
+        <label>Augmentation annuelle des cotisations</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="contribGrowth" value="2" min="0" max="20" step="0.1"><span class="input-unit">%/an</span></div>
+        <span class="field-hint">Ex: hausses de salaire</span>
+      </div>
+      <div class="field">
+        <label>Rendement annuel (accumulation)</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="growthRate" value="3.5" min="0" max="30" step="0.1"><span class="input-unit">%/an</span></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-title"><span class="section-number">3</span>Phase de retraite</div>
+    <div class="grid-3" style="margin-bottom:20px">
+      <div class="field">
+        <label>Retrait annuel</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="annualWithdrawal" value="36000" min="0"><span class="input-unit">$/an</span></div>
+        <span class="field-hint">Ex: 3 000$/mois = 36 000$/an</span>
+      </div>
+      <div class="field">
+        <label>Rendement annuel</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="retirGrowthRate" value="2.5" min="0" max="30" step="0.1"><span class="input-unit">%/an</span></div>
+        <span class="field-hint">Souvent plus conservateur</span>
+      </div>
+      <div class="field">
+        <label>Inflation anticipée</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="inflation" value="2" min="0" max="15" step="0.1"><span class="input-unit">%/an</span></div>
+        <span class="field-hint">Indexe le retrait annuellement</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-title"><span class="section-number">4</span>Rente RRQ / RPC</div>
+    <div class="grid-3" style="margin-bottom:12px">
+      <div class="field">
+        <label>Rente de base</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="rrqBase" value="0" min="0" oninput="updateRrq()"><span class="input-unit">$/an</span></div>
+        <span class="field-hint">Ex: 10 125$/an selon Desjardins</span>
+      </div>
+      <div class="field">
+        <label>Âge de début</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="rrqAge" value="65" min="60" max="70" oninput="updateRrq()"><span class="input-unit">ans</span></div>
+        <span class="field-hint">60-64: -7,2%/an &nbsp; 66-70: +8,4%/an</span>
+      </div>
+      <div class="field">
+        <label>Rente RRQ</label>
+        <div class="calc-display">
+          <span id="rrqPct" style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted)">+-0%</span>
+          <span id="rrqFinal" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--blue)">= 0 $/an</span>
+        </div>
+        <span class="field-hint">Calcul automatique</span>
+      </div>
+    </div>
+    <div class="info-box blue">
+      Avant 65 ans : pénalité de 7,2%/an (à 60 ans = -36%). &nbsp; Après 65 ans : prime de 8,4%/an (à 70 ans = +42%).
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-title"><span class="section-number">5</span>Pension de Sécurité de la Vieillesse (PSV)</div>
+    <div class="grid-3" style="margin-bottom:12px">
+      <div class="field">
+        <label>Montant de la PSV (À 65 ans)</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvBase" value="8727" min="0" oninput="updatePsv()"><span class="input-unit">$/an</span></div>
+        <span class="field-hint">2024 ≈ 8 727$/an</span>
+      </div>
+      <div class="field">
+        <label>Années au Canada (après 18 ans)</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvYears" value="40" min="1" max="40" oninput="updatePsv()"><span class="input-unit">ans</span></div>
+        <span class="field-hint">Max 40 -- proratisé si moins de 40</span>
+      </div>
+      <div class="field">
+        <label>Âge de début (de la PSV)</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvAge" value="65" min="65" max="70" oninput="updatePsv()"><span class="input-unit">ans</span></div>
+        <span class="field-hint">65-70: +7,2%/an de report</span>
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label class="calc-label">Montant PSV final calculé</label>
+      <div class="calc-display">
+        <span id="psvDefer" style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted)">+0% report</span>
+        <span id="psvProrata" style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted)">x 100% residence</span>
+        <span id="psvFinal" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--blue)">= 8 727 $/an</span>
+      </div>
+    </div>
+    <div class="info-box blue">
+      Report à 70 ans = +36% (5 x 7,2%). Si vous avez vécu au Canada moins de 40 ans après vos 18 ans, le montant est ajusté à la baisse (ex. : 20 ans = 50% de la pension).
+    </div>
+
+    <button class="btn-calc" onclick="calculate(true)">Simuler ma retraite</button>
+  </div>
+
+  <div id="results">
+    <div class="account-summary-card">
+      <div class="account-summary-head">
+        <div>
+          <div class="account-summary-kicker">SOLDE DES COMPTES</div>
+          <div class="account-summary-total">
+            <div class="account-summary-value" id="sFinal">--</div>
+            <div class="account-summary-note" id="sFinalLifeLabel">Montant en fin de vie</div>
+          </div>
+          <div class="account-summary-metrics">
+            <div class="account-summary-metric">
+              <span class="account-summary-metric-label">Capital à la retraite</span>
+              <span class="account-summary-metric-value" id="sRetirement">--</span>
+            </div>
+            <div class="account-summary-metric">
+              <span class="account-summary-metric-label">Total cotisé</span>
+              <span class="account-summary-metric-value" id="sContrib">--</span>
+            </div>
+            <div class="account-summary-metric">
+              <span class="account-summary-metric-label">Intérêts générés</span>
+              <span class="account-summary-metric-value" id="sInterest">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="account-summary-grid">
+        <div class="account-summary-item">
+          <div class="account-summary-item-head">
+            <span class="account-badge">A</span>
+            <span class="account-summary-item-title">CELI</span>
+          </div>
+          <div class="account-summary-item-value teal" id="sCeli">--</div>
+          <div class="account-sub" id="sCeliDetail">Droits restants: --</div>
+        </div>
+        <div class="account-summary-item">
+          <div class="account-summary-item-head">
+            <span class="account-badge">B</span>
+            <span class="account-summary-item-title">REER</span>
+          </div>
+          <div class="account-summary-item-value orange" id="sReer">--</div>
+          <div class="account-sub" id="sReerDetail">Droits restants: --</div>
+        </div>
+        <div class="account-summary-item">
+          <div class="account-summary-item-head">
+            <span class="account-badge">C</span>
+            <span class="account-summary-item-title">Compte non enregistré</span>
+          </div>
+          <div class="account-summary-item-value green" id="sNonReg">--</div>
+          <div class="account-sub" id="sNonRegDetail">Aucune limite de cotisation</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="nWarn" class="notice warn" style="display:none"></div>
+
+    <div class="chart-card">
+      <div class="chart-title">Évolution du capital</div>
+      <div class="chart-subtitle">Par année</div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot legend-dot-accum"></div>Capital (accumulation)</div>
+        <div class="legend-item"><div class="legend-dot legend-dot-retired"></div>Capital (retraite)</div>
+      </div>
+      <div class="chart-area">
+        <div class="axis-label axis-label-y">Montant</div>
+        <div class="axis-label axis-label-x">Âge</div>
+        <div class="chart-inner" id="chartInner">
+          <div class="bars-area" id="barsArea"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-head">
+        <div class="table-title">Données annuelles détaillées</div>
+        <button class="tbl-toggle" id="toggleBtn" onclick="toggleTable()">Voir tout</button>
+      </div>
+      <div class="table-layout">
+        <div class="phase-rail" id="phaseRail" aria-hidden="true">
+          <div class="phase-rail-segment pre" id="phasePre">Pré-retraite</div>
+          <div class="phase-rail-segment ret" id="phaseRet">Retraite</div>
+        </div>
+        <div class="table-scroll-wrap" style="overflow-x:auto">
+          <table class="dtable">
+            <thead>
+              <tr>
+                <th>Âge</th>
+                <th>Capital début</th>
+                <th>Cotisation</th>
+                <th>Retrait capital</th>
+                <th>Revenu gouv.</th>
+                <th>Rendement</th>
+                <th>Capital fin</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+    <aside class="ai-assistant" aria-label="Assistant">
+      <div class="ai-assistant-head">
+        <div>
+          <h2 class="ai-assistant-title">Assistant</h2>
+        </div>
+        <div class="ai-assistant-head-actions">
+          <button type="button" class="ai-assistant-toggle" aria-expanded="true">Réduire</button>
+        </div>
+      </div>
+
+      <div class="ai-chat">
+        <div class="ai-message ai-message-bot">
+          <div class="ai-message-label">Assistant</div>
+          <div class="ai-message-bubble">Bonjour. On va remplir ton profil retraite ensemble. Première question: quel âge as-tu aujourd’hui ?</div>
+        </div>
+        <div class="ai-message ai-message-user">
+          <div class="ai-message-label">Toi</div>
+          <div class="ai-message-bubble">62 ans</div>
+        </div>
+        <div class="ai-message ai-message-bot">
+          <div class="ai-message-label">Assistant</div>
+          <div class="ai-message-bubble">Merci. Maintenant, à quel âge veux-tu prendre ta retraite ?</div>
+        </div>
+      </div>
+
+      <div class="ai-assistant-input">
+        <input type="text" placeholder="Répondre ici..." aria-label="Réponse à la question de l'assistant">
+        <button type="button">Envoyer</button>
+      </div>
+
+      <div class="ai-assistant-actions">
+        <button type="button" class="ai-assistant-primary is-hidden">SIMULER MA RETRAITE</button>
+      </div>
+    </aside>
+</div>
+
+<footer class="app-footer">
+  <div class="app-footer-inner">
+    <a class="footer-name" href="https://nicolasgourgues.com/" target="_blank" rel="noopener noreferrer" aria-label="Site web de Nicolas Gourgues">par Nicolas Gourgues</a>
+    <a class="footer-credit" href="https://claude.ai" target="_blank" rel="noopener noreferrer" aria-label="Claude AI">
+      <span>Avec l'aide de Claude AI</span>
+      <img class="footer-logo footer-logo-claude" src="https://img.icons8.com/?size=100&id=1G3UNEZHMjPH&format=png&color=FFFFFF" alt="Logo Claude AI" loading="lazy" onerror="this.onerror=null;this.src='https://img.icons8.com/?size=100&id=l9ZbAeUVE0l3&format=png&color=FFFFFF';">
+    </a>
+    <a class="footer-credit" href="https://github.com/features/copilot" target="_blank" rel="noopener noreferrer" aria-label="GitHub Copilot">
+      <span>Avec l'aide de GitHub Copilot</span>
+      <img class="footer-logo footer-logo-copilot" src="https://cdn.simpleicons.org/githubcopilot/FFFFFF" alt="Logo GitHub Copilot" loading="lazy">
+    </a>
+  </div>
+</footer>
+
+<script src="script.js?v=20260406b"></script>
+</body>
+</html>
+
