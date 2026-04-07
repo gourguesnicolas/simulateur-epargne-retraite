@@ -1,6 +1,6 @@
 # Simulateur d'épargne retraite
 
-Un simulateur web en français pour estimer l'évolution d'une épargne retraite, comparer plusieurs sources d'épargne et visualiser l'impact des cotisations, du rendement et des retraits au fil du temps.
+Un simulateur web pour estimer l'évolution d'une épargne retraite, comparer plusieurs sources d'épargne et visualiser l'impact des cotisations, du rendement et des retraits au fil du temps.
 
 ## Accès au simulateur
 
@@ -26,10 +26,6 @@ Ce simulateur a été conçu pour toute personne qui souhaite obtenir un aperçu
 2. Renseignez vos paramètres de départ.
 3. Ajustez les cotisations, le rendement et les paramètres de retraite.
 4. Lancez la simulation pour observer l'évolution projetée.
-
-## Crédits
-
-Projet personnel développé en français autour d'un thème d'épargne retraite.
 
 ## Licence
 
