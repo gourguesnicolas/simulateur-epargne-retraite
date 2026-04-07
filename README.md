@@ -1,52 +1,36 @@
 # Simulateur d'épargne retraite
 
-Application web statique pour estimer l'évolution d'une épargne retraite, comparer plusieurs types de comptes et visualiser l'impact des cotisations, du rendement et des retraits dans le temps.
+Un simulateur web en français pour estimer l'évolution d'une épargne retraite, comparer plusieurs sources d'épargne et visualiser l'impact des cotisations, du rendement et des retraits au fil du temps.
 
-## Démo
+## Accès au simulateur
 
-Une version en ligne peut être publiée via GitHub Pages :
+Le projet est disponible en ligne sur GitHub Pages :
 
 https://gourguesnicolas.github.io/simulateur-epargne-retraite/
 
-## Fonctionnalités
+## Ce que permet le simulateur
 
-- Projection de l'épargne avant la retraite.
-- Modélisation de la phase de décaissement.
-- Gestion de plusieurs comptes : CELI, REER et compte non enregistré.
-- Paramètres personnalisables pour les cotisations, le rendement et l'inflation.
-- Estimation de la RRQ / RPC et de la PSV.
-- Interface en français, utilisable directement dans le navigateur.
+- Estimer l'accumulation de l'épargne avant la retraite.
+- Modéliser la phase de retraite avec des retraits annuels.
+- Comparer plusieurs comptes : CELI, REER et compte non enregistré.
+- Ajuster les cotisations, le rendement et l'inflation selon différents scénarios.
+- Visualiser la RRQ / RPC et la PSV dans le calcul global.
 
-## Pour qui ?
+## À qui s'adresse ce projet ?
 
-Ce projet s'adresse aux personnes qui veulent obtenir un aperçu simple et visuel de leur trajectoire d'épargne retraite. Les résultats sont fournis à titre indicatif et ne constituent pas un conseil financier.
+Ce simulateur a été conçu pour toute personne qui souhaite obtenir un aperçu simple, visuel et personnalisé de sa trajectoire d'épargne retraite. Les résultats sont fournis à titre indicatif et ne remplacent pas un avis financier professionnel.
 
-## Utilisation
+## Comment utiliser le simulateur
 
-Le projet ne nécessite aucune installation.
-
-1. Ouvre `index.html` dans ton navigateur.
-2. Ajuste les paramètres selon ta situation.
-3. Lance la simulation à partir de l'interface.
-
-## Projet local
-
-- `index.html` : structure de l'application.
-- `styles.css` : styles et mise en page.
-- `script.js` : logique de calcul et interactions.
-
-## Déploiement sur GitHub Pages
-
-1. Ouvre le dépôt sur GitHub.
-2. Va dans `Settings` > `Pages`.
-3. Dans `Build and deployment`, sélectionne `Deploy from a branch`.
-4. Choisis la branche `main` et le dossier `/root`.
-5. Patiente jusqu'à la publication du site.
+1. Ouvrez le site.
+2. Renseignez vos paramètres de départ.
+3. Ajustez les cotisations, le rendement et les paramètres de retraite.
+4. Lancez la simulation pour observer l'évolution projetée.
 
 ## Crédits
 
-Projet personnel développé comme simulateur d'épargne retraite en français.
+Projet personnel développé en français autour d'un thème d'épargne retraite.
 
 ## Licence
 
-Aucune licence n'a été définie pour le moment. Si tu souhaites réutiliser ce projet, merci de me contacter avant toute redistribution.
+Aucune licence n'a été définie pour le moment.
