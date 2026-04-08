@@ -32,13 +32,17 @@ var assistantBaseSteps = [
   { field: 'celiAnnualContrib', label: 'Quel montant veux-tu cotiser chaque année dans le CELI ?', type: 'number', placeholder: '3000' },
   { field: 'reerAnnualContrib', label: 'Quel montant veux-tu cotiser chaque année dans le REER ?', type: 'number', placeholder: '2000' },
   { field: 'nonRegAnnualContrib', label: 'Quel montant veux-tu cotiser chaque année dans le compte non enregistré ?', type: 'number', placeholder: '1000' },
+  { field: 'contribGrowth', label: 'De combien veux-tu augmenter tes cotisations chaque année ?', type: 'number', placeholder: '2' },
   { field: 'annualWithdrawal', label: 'Quel retrait annuel souhaites-tu à la retraite ?', type: 'number', placeholder: '36000' },
   { field: 'growthRate', label: 'Quel rendement annuel veux-tu jusqu\'à ta retraite ?', type: 'number', placeholder: '3.5' },
   { field: 'retirGrowthRate', label: 'Quel rendement annuel veux-tu à la retraite ?', type: 'number', placeholder: '2.5' },
-  { field: 'inflation', label: 'Quelle elle le pourcentage d\'inflation annuelle que tu prévoit durtant ta retraite (pour indexer tes retraits) ?', type: 'number', placeholder: '2' },
+  { field: 'inflation', label: 'Quelle elle le pourcentage d\'inflation annuelle que tu prévoit durant ta retraite (pour indexer tes retraits) ?', type: 'number', placeholder: '2' },
   { field: 'celiLimitMode', label: 'Veux-tu appliquer les limites de cotisation CELI ?', type: 'choice', choices: ['yes', 'no'], placeholder: 'non' },
   { field: 'reerLimitMode', label: 'Veux-tu appliquer les limites de cotisation REER ?', type: 'choice', choices: ['yes', 'no'], placeholder: 'non' },
+  { field: 'rrqBase', label: 'Quel est le montant de ta rente de base RRQ (par année) ?', type: 'number', placeholder: '10125' },
   { field: 'rrqAge', label: 'À quel âge veux-tu commencer la RRQ ?', type: 'number', placeholder: '65' },
+  { field: 'psvBase', label: 'Quel est le montant de la PSV (par année) ?', type: 'number', placeholder: '8727' },
+  { field: 'psvYears', label: 'Combien d’années au Canada après tes 18 ans auras-tu vécu au moment de prendre ta PSV ?', type: 'number', placeholder: '40' },
   { field: 'psvAge', label: 'À quel âge veux-tu commencer la PSV ?', type: 'number', placeholder: '65' }
 ];
 
@@ -371,7 +375,7 @@ function assistantParseStepValue(step, rawValue) {
     parsed = Math.round(parsed);
   } else if (step.field === 'endAge') {
     parsed = Math.round(parsed);
-  } else if (step.field === 'rrqAge' || step.field === 'psvAge') {
+  } else if (step.field === 'rrqAge' || step.field === 'psvAge' || step.field === 'psvYears') {
     parsed = Math.round(parsed);
   }
 
@@ -813,9 +817,11 @@ function niceTickStep(maxValue, tickCount) {
 function updateRrq() {
   var base = getNumericValue('rrqBase', 0);
   var age  = Math.round(getNumericValue('rrqAge', 65));
-  var diff = age - 65;
+  var effectiveAge = Math.min(age, 72);
+  var diff = effectiveAge - 65;
   var adjPct = diff < 0 ? diff * 7.2 : diff * 8.4;
-  var finalAnnual = base * (1 + adjPct / 100);
+  adjPct = Math.max(-100, adjPct);
+  var finalAnnual = Math.max(0, base * (1 + adjPct / 100));
   var el = document.getElementById('rrqPct');
   el.textContent = (adjPct >= 0 ? '+' : '') + adjPct.toFixed(1) + '%';
   el.style.color = adjPct < 0 ? 'var(--accent3)' : adjPct > 0 ? 'var(--accent2)' : 'var(--muted)';
@@ -874,9 +880,11 @@ function calculate(focusResults) {
   // RRQ
   var rrqBase    = getNumericValue('rrqBase', 0);
   var rrqAge     = Math.round(getNumericValue('rrqAge', 65));
-  var rrqDiff    = rrqAge - 65;
+  var rrqEffectiveAge = Math.min(rrqAge, 72);
+  var rrqDiff    = rrqEffectiveAge - 65;
   var rrqAdjPct  = rrqDiff < 0 ? rrqDiff * 7.2 : rrqDiff * 8.4;
-  var rrqAnnual  = rrqBase * (1 + rrqAdjPct / 100);
+  rrqAdjPct = Math.max(-100, rrqAdjPct);
+  var rrqAnnual  = Math.max(0, rrqBase * (1 + rrqAdjPct / 100));
 
   // PSV
   var psvBase    = getNumericValue('psvBase', 0);
