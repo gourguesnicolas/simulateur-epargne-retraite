@@ -140,7 +140,7 @@
         <span class="field-hint">Ex: hausses de salaire</span>
       </div>
       <div class="field">
-        <label>Rendement annuel (accumulation)</label>
+        <label>Rendement annuel (pré-retraite)</label>
         <div class="input-wrap"><input type="text" inputmode="decimal" id="growthRate" value="3.5" min="0" max="30" step="0.1"><span class="input-unit">%/an</span></div>
       </div>
     </div>
@@ -155,7 +155,7 @@
         <span class="field-hint">Ex: 3 000$/mois = 36 000$/an</span>
       </div>
       <div class="field">
-        <label>Rendement annuel</label>
+        <label>Rendement annuel (retraite)</label>
         <div class="input-wrap"><input type="text" inputmode="decimal" id="retirGrowthRate" value="2.5" min="0" max="30" step="0.1"><span class="input-unit">%/an</span></div>
         <span class="field-hint">Souvent plus conservateur</span>
       </div>
@@ -169,7 +169,7 @@
     <div class="divider"></div>
 
     <div class="section-title"><span class="section-number">4</span>Rente RRQ / RPC</div>
-    <div class="grid-3" style="margin-bottom:12px">
+    <div class="grid-2" style="margin-bottom:12px">
       <div class="field">
         <label>Rente de base</label>
         <div class="input-wrap"><input type="text" inputmode="decimal" id="rrqBase" value="0" min="0" oninput="updateRrq()"><span class="input-unit">$/an</span></div>
@@ -179,6 +179,11 @@
         <label>Âge de début</label>
         <div class="input-wrap"><input type="text" inputmode="decimal" id="rrqAge" value="65" min="60" max="72" oninput="updateRrq()"><span class="input-unit">ans</span></div>
         <span class="field-hint">60-64: -7,2%/an &nbsp; 66-72: +8,4%/an (plafonné à 72)</span>
+      </div>
+      <div class="field">
+        <label>Taux d'indexation annuel RRQ</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="rrqIndexRate" value="2.0" min="0" max="15" step="0.1" oninput="updateRrq()"><span class="input-unit">%/an</span></div>
+        <span class="field-hint">2026: 2,0% (Retraite Québec)</span>
       </div>
       <div class="field">
         <label>Rente RRQ</label>
@@ -196,11 +201,11 @@
     <div class="divider"></div>
 
     <div class="section-title"><span class="section-number">5</span>Pension de Sécurité de la Vieillesse (PSV)</div>
-    <div class="grid-3" style="margin-bottom:12px">
+    <div class="grid-2" style="margin-bottom:12px">
       <div class="field">
         <label>Montant de la PSV (À 65 ans)</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvBase" value="8727" min="0" oninput="updatePsv()"><span class="input-unit">$/an</span></div>
-        <span class="field-hint">2024 ≈ 8 727$/an</span>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvBase" value="8917" min="0" oninput="updatePsv()"><span class="input-unit">$/an</span></div>
+        <span class="field-hint">2026 ≈ 8 917$/an</span>
       </div>
       <div class="field">
         <label>Années au Canada (après 18 ans)</label>
@@ -212,13 +217,18 @@
         <div class="input-wrap"><input type="text" inputmode="decimal" id="psvAge" value="65" min="65" max="70" oninput="updatePsv()"><span class="input-unit">ans</span></div>
         <span class="field-hint">65-70: +7,2%/an de report</span>
       </div>
+      <div class="field">
+        <label>Taux d'indexation annuel PSV</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvIndexRate" value="2.1" min="0" max="15" step="0.1" oninput="updatePsv()"><span class="input-unit">%/an</span></div>
+        <span class="field-hint">2026: +2,1% sur 12 mois (Canada.ca)</span>
+      </div>
     </div>
     <div style="margin-bottom:12px">
       <label class="calc-label">Montant PSV final calculé</label>
       <div class="calc-display">
         <span id="psvDefer" style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted)">+0% report</span>
         <span id="psvProrata" style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted)">x 100% residence</span>
-        <span id="psvFinal" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--blue)">= 8 727 $/an</span>
+        <span id="psvFinal" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--blue)">= 8 917 $/an</span>
       </div>
     </div>
     <div class="info-box blue">
@@ -288,7 +298,7 @@
       <div class="chart-title">Évolution du capital</div>
       <div class="chart-subtitle">Par année</div>
       <div class="legend">
-        <div class="legend-item"><div class="legend-dot legend-dot-accum"></div>Capital (accumulation)</div>
+        <div class="legend-item"><div class="legend-dot legend-dot-accum"></div>Capital (pré-retraite)</div>
         <div class="legend-item"><div class="legend-dot legend-dot-retired"></div>Capital (retraite)</div>
       </div>
       <div class="chart-area">

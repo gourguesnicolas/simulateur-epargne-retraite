@@ -391,10 +391,10 @@ body::before {
 }
 
 .ai-message-label {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15px;
+  text-transform: none;
   color: color-mix(in oklab, var(--muted) 82%, #c6e4ff 18%);
 }
 
@@ -411,6 +411,14 @@ body::before {
 .ai-message-bot .ai-message-bubble {
   background: var(--surface);
   color: var(--text);
+}
+
+.ai-question-format {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: color-mix(in oklab, var(--accent) 72%, #bfefff 28%);
 }
 
 .ai-message-user {

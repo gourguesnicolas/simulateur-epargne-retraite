@@ -41,9 +41,11 @@ var assistantBaseSteps = [
   { field: 'reerLimitMode', label: 'Veux-tu appliquer les limites de cotisation REER ?', type: 'choice', choices: ['yes', 'no'], placeholder: 'non' },
   { field: 'rrqBase', label: 'Quel est le montant de ta rente de base RRQ (par année) ?', type: 'number', placeholder: '10125' },
   { field: 'rrqAge', label: 'À quel âge veux-tu commencer la RRQ ?', type: 'number', placeholder: '65' },
-  { field: 'psvBase', label: 'Quel est le montant de la PSV (par année) ?', type: 'number', placeholder: '8727' },
+  { field: 'rrqIndexRate', label: 'Quel taux d\'indexation annuelle veux-tu utiliser pour la RRQ ?', type: 'number', placeholder: '2.0' },
+  { field: 'psvBase', label: 'Quel est le montant de la PSV (par année) ?', type: 'number', placeholder: '8917' },
   { field: 'psvYears', label: 'Combien d’années au Canada après tes 18 ans auras-tu vécu au moment de prendre ta PSV ?', type: 'number', placeholder: '40' },
-  { field: 'psvAge', label: 'À quel âge veux-tu commencer la PSV ?', type: 'number', placeholder: '65' }
+  { field: 'psvAge', label: 'À quel âge veux-tu commencer la PSV ?', type: 'number', placeholder: '65' },
+  { field: 'psvIndexRate', label: 'Quel taux d\'indexation annuelle veux-tu utiliser pour la PSV ?', type: 'number', placeholder: '2.1' }
 ];
 
 var assistantConditionalStepGroups = {
@@ -168,8 +170,53 @@ function assistantConfigureConditionalSteps(choiceField, choiceValue) {
   }
 }
 
-function assistantQuestionForStep(step) {
-  return step ? step.label : '';
+function assistantQuestionForStep(step, options) {
+  if (!step) return '';
+
+  var percentFields = {
+    contribGrowth: true,
+    growthRate: true,
+    retirGrowthRate: true,
+    inflation: true,
+    reerRoomRate: true,
+    rrqIndexRate: true,
+    psvIndexRate: true
+  };
+  var ageFields = {
+    currentAge: true,
+    retirementAge: true,
+    endAge: true,
+    rrqAge: true,
+    psvYears: true,
+    psvAge: true
+  };
+  var annualDollarFields = {
+    celiAnnualContrib: true,
+    reerAnnualContrib: true,
+    nonRegAnnualContrib: true,
+    annualWithdrawal: true,
+    rrqBase: true,
+    psvBase: true,
+    celiAnnualLimit: true,
+    reerIncome: true,
+    reerAnnualCap: true
+  };
+
+  var expectedFormat = 'Réponse en $ (nombre)';
+  if (step.type === 'choice') {
+    expectedFormat = 'Réponse: Oui ou Non';
+  } else if (percentFields[step.field]) {
+    expectedFormat = 'Réponse en % (ex: 2,5)';
+  } else if (ageFields[step.field]) {
+    expectedFormat = 'Réponse en années (nombre)';
+  } else if (annualDollarFields[step.field]) {
+    expectedFormat = 'Réponse en $/an (nombre)';
+  }
+
+  if (options && options.asHtml) {
+    return step.label + '<span class="ai-question-format">' + expectedFormat + '</span>';
+  }
+  return step.label + ' - ' + expectedFormat;
 }
 
 function assistantTrackAskedQuestion(question) {
@@ -182,9 +229,9 @@ function assistantTrackAskedQuestion(question) {
 
 function assistantAskStepQuestion(step, forcedQuestion) {
   if (!step) return;
-  var questionText = (forcedQuestion && String(forcedQuestion).trim()) || assistantQuestionForStep(step);
-  assistantAppendBotMessageWithTyping(questionText, false, 520);
-  assistantTrackAskedQuestion(questionText);
+  var questionText = (forcedQuestion && String(forcedQuestion).trim()) || assistantQuestionForStep(step, { asHtml: true });
+  assistantAppendBotMessageWithTyping(questionText, true, 520);
+  assistantTrackAskedQuestion(assistantQuestionForStep(step));
 }
 
 function assistantSetBusy(isBusy) {
@@ -344,7 +391,7 @@ function assistantResetSession(showRestartNotice) {
 
   assistantAppendBotMessageWithTyping('Bonjour. Je peux remplir le formulaire retraite avec toi, question par question.', false, 380);
   assistantSetTimer(function() {
-    assistantAppendBotMessageWithTyping('Veux-tu commencer le remplissage du formulaire ?', false, 420);
+    assistantAppendBotMessageWithTyping('Veux-tu commencer le remplissage du formulaire ? <span class="ai-question-format">Réponse: Oui ou Non</span>', true, 420);
   }, 420);
 
   assistantSetConsentPrompt();
@@ -817,13 +864,19 @@ function niceTickStep(maxValue, tickCount) {
 function updateRrq() {
   var base = getNumericValue('rrqBase', 0);
   var age  = Math.round(getNumericValue('rrqAge', 65));
+  var indexRate = Math.max(0, getNumericValue('rrqIndexRate', 2.0)) / 100;
   var effectiveAge = Math.min(age, 72);
   var diff = effectiveAge - 65;
+  var indexYears = Math.max(0, effectiveAge - 65);
+  var indexFactor = Math.pow(1 + indexRate, indexYears);
   var adjPct = diff < 0 ? diff * 7.2 : diff * 8.4;
   adjPct = Math.max(-100, adjPct);
-  var finalAnnual = Math.max(0, base * (1 + adjPct / 100));
+  var finalAnnual = Math.max(0, base * indexFactor * (1 + adjPct / 100));
+  var indexPct = (indexFactor - 1) * 100;
   var el = document.getElementById('rrqPct');
-  el.textContent = (adjPct >= 0 ? '+' : '') + adjPct.toFixed(1) + '%';
+  var ageAdjText = (adjPct >= 0 ? '+' : '') + adjPct.toFixed(1) + '% âge';
+  var indexText = indexPct > 0 ? (' | +' + indexPct.toFixed(1) + '% indexation') : '';
+  el.textContent = ageAdjText + indexText;
   el.style.color = adjPct < 0 ? 'var(--accent3)' : adjPct > 0 ? 'var(--accent2)' : 'var(--muted)';
   document.getElementById('rrqFinal').textContent = '= ' + Math.round(finalAnnual) + ' $/an';
 }
@@ -832,14 +885,18 @@ function updatePsv() {
   var base    = getNumericValue('psvBase', 0);
   var years   = Math.min(40, Math.max(0, Math.round(getNumericValue('psvYears', 40))));
   var age     = Math.round(getNumericValue('psvAge', 65));
+  var indexRate = Math.max(0, getNumericValue('psvIndexRate', 2.1)) / 100;
   var defer   = Math.max(0, Math.min(5, age - 65));
   var bonusPct = defer * 7.2;
+  var indexYears = Math.max(0, age - 65);
+  var indexFactor = Math.pow(1 + indexRate, indexYears);
+  var indexPct = (indexFactor - 1) * 100;
   var prorata  = years / 40;
-  var finalAnnual = base * (1 + bonusPct / 100) * prorata;
+  var finalAnnual = base * indexFactor * (1 + bonusPct / 100) * prorata;
 
   var dEl = document.getElementById('psvDefer');
-  dEl.textContent = defer > 0 ? '+' + bonusPct.toFixed(1) + '% report' : '+0% report';
-  dEl.style.color = defer > 0 ? 'var(--accent2)' : 'var(--muted)';
+  dEl.textContent = (defer > 0 ? '+' + bonusPct.toFixed(1) + '% report' : '+0% report') + (indexPct > 0 ? (' | +' + indexPct.toFixed(1) + '% indexation') : '');
+  dEl.style.color = defer > 0 || indexPct > 0 ? 'var(--accent2)' : 'var(--muted)';
 
   var pEl = document.getElementById('psvProrata');
   pEl.textContent = 'x ' + Math.round(prorata * 100) + '% résidence';
@@ -880,18 +937,22 @@ function calculate(focusResults) {
   // RRQ
   var rrqBase    = getNumericValue('rrqBase', 0);
   var rrqAge     = Math.round(getNumericValue('rrqAge', 65));
+  var rrqIndexRate = Math.max(0, getNumericValue('rrqIndexRate', 2.0)) / 100;
   var rrqEffectiveAge = Math.min(rrqAge, 72);
   var rrqDiff    = rrqEffectiveAge - 65;
+  var rrqIndexYears = Math.max(0, rrqEffectiveAge - 65);
   var rrqAdjPct  = rrqDiff < 0 ? rrqDiff * 7.2 : rrqDiff * 8.4;
   rrqAdjPct = Math.max(-100, rrqAdjPct);
-  var rrqAnnual  = Math.max(0, rrqBase * (1 + rrqAdjPct / 100));
+  var rrqAnnualAtStart  = Math.max(0, rrqBase * Math.pow(1 + rrqIndexRate, rrqIndexYears) * (1 + rrqAdjPct / 100));
 
   // PSV
   var psvBase    = getNumericValue('psvBase', 0);
   var psvYears   = Math.min(40, Math.max(0, Math.round(getNumericValue('psvYears', 40))));
   var psvAge     = Math.round(getNumericValue('psvAge', 65));
+  var psvIndexRate = Math.max(0, getNumericValue('psvIndexRate', 2.1)) / 100;
   var psvDefer   = Math.max(0, Math.min(5, psvAge - 65));
-  var psvAnnual  = psvBase * (1 + psvDefer * 0.072) * (psvYears / 40);
+  var psvIndexYears = Math.max(0, psvAge - 65);
+  var psvAnnualAtStart  = psvBase * Math.pow(1 + psvIndexRate, psvIndexYears) * (1 + psvDefer * 0.072) * (psvYears / 40);
 
   if (retirementAge <= currentAge || endAge <= retirementAge) {
     alert('Vérifiez les âges : actuel < retraite < fin');
@@ -956,7 +1017,9 @@ function calculate(focusResults) {
 
     var rrqActive  = age >= rrqAge;
     var psvActive  = age >= psvAge;
-    var govAnnual  = (rrqActive ? rrqAnnual : 0) + (psvActive ? psvAnnual : 0);
+    var rrqAnnual = rrqActive ? rrqAnnualAtStart * Math.pow(1 + rrqIndexRate, age - rrqAge) : 0;
+    var psvAnnual = psvActive ? psvAnnualAtStart * Math.pow(1 + psvIndexRate, age - psvAge) : 0;
+    var govAnnual  = rrqAnnual + psvAnnual;
 
     // Monthly compounding
     for (var m = 0; m < 12; m++) {
@@ -1088,7 +1151,7 @@ function calculate(focusResults) {
     reer: reerLimitsEnabled
   };
 
-  renderResults(retirementAge, endAge, totalContrib, bankruptAge, psvAge, psvAnnual, rrqAge, rrqAnnual);
+  renderResults(retirementAge, endAge, totalContrib, bankruptAge, psvAge, psvAnnualAtStart, rrqAge, rrqAnnualAtStart);
   document.getElementById('results').style.display = 'block';
 
   if (shouldFocusResults) {
