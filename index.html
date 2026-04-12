@@ -13,7 +13,7 @@
   <div class="app-main">
   <header>
     <div class="header-content">
-      <div class="header-label">// simulateur financier</div>
+      <div class="header-label">simulateur financier</div>
       <h1>Épargne <em>Retraite</em></h1>
       <p class="subtitle">Vos placements continuent de croître même après le début des retraits.</p>
     </div>
@@ -26,7 +26,7 @@
   <div class="form-card">
 
     <div class="section-title"><span class="section-number">1</span>Profil personnel</div>
-    <div class="grid-3" style="margin-bottom:20px">
+    <div class="grid-3" style="margin-bottom:12px">
       <div class="field">
         <label>Âge actuel</label>
         <div class="input-wrap"><input type="text" inputmode="decimal" id="currentAge" value="25" min="15" max="80"><span class="input-unit">ans</span></div>
@@ -41,6 +41,8 @@
         <div class="input-wrap"><input type="text" inputmode="decimal" id="endAge" value="90" min="60" max="110"><span class="input-unit">ans</span></div>
       </div>
     </div>
+
+    <div class="divider"></div>
 
 
     <div class="section-title"><span class="section-number">2</span>Épargne &amp; cotisations</div>
@@ -348,6 +350,9 @@
           <h2 class="ai-assistant-title">Assistant</h2>
         </div>
         <div class="ai-assistant-head-actions">
+          <button type="button" class="ai-assistant-reset" aria-label="Recommencer le formulaire" title="Recommencer le formulaire">
+            <img class="ai-assistant-reset-icon" src="https://cdn-icons-png.flaticon.com/512/4210/4210604.png" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='https://img.icons8.com/?size=100&id=63949&format=png&color=FFFFFF';">
+          </button>
           <button type="button" class="ai-assistant-toggle" aria-expanded="true">Réduire</button>
         </div>
       </div>
@@ -392,7 +397,7 @@
   </div>
 </footer>
 
-<script src="script.js?v=20260406b"></script>
+<script src="script.js?v=20260412a"></script>
 </body>
 </html>
 

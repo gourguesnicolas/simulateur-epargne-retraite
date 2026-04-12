@@ -14,6 +14,8 @@ var assistantState = {
   collected: {},
   complete: false,
   busy: false,
+  awaitingRestartConfirm: false,
+  restoreBusyAfterRestartConfirm: false,
   askedQuestions: [],
   started: false,
   waitingStartConsent: true,
@@ -70,6 +72,7 @@ var assistantElements = {
   input: null,
   sendButton: null,
   applyButton: null,
+  resetButton: null,
   toggleButton: null
 };
 
@@ -364,6 +367,21 @@ function assistantAppendBotMessageWithTyping(text, allowHtml, delayMs) {
   }, typingDelay);
 }
 
+function assistantRequestRestartConfirmation() {
+  if (!assistantElements.root || !assistantElements.input) return;
+  if (assistantState.awaitingRestartConfirm) return;
+
+  assistantState.awaitingRestartConfirm = true;
+  assistantState.restoreBusyAfterRestartConfirm = assistantState.complete && assistantState.busy;
+
+  if (assistantState.restoreBusyAfterRestartConfirm) {
+    assistantSetBusy(false);
+  }
+
+  assistantAppendBotMessageWithTyping('Voulez-vous vraiment recommencer le remplissage du formulaire du début ? <span class="ai-question-format ai-question-format-warn">Réponse: Oui ou Non</span>', true, 280);
+  assistantSetConsentPrompt();
+}
+
 function assistantResetSession(showRestartNotice) {
   if (!assistantElements.chat) return;
 
@@ -374,6 +392,8 @@ function assistantResetSession(showRestartNotice) {
   assistantState.collected = {};
   assistantState.complete = false;
   assistantState.busy = false;
+  assistantState.awaitingRestartConfirm = false;
+  assistantState.restoreBusyAfterRestartConfirm = false;
   assistantState.askedQuestions = [];
   assistantState.started = false;
   assistantState.waitingStartConsent = true;
@@ -481,6 +501,47 @@ async function assistantHandleAnswer(rawValue) {
 
   assistantAppendMessage('user', 'Toi', trimmedValue);
 
+  if (assistantState.awaitingRestartConfirm) {
+    var restartConsent = assistantNormalizeChoice(trimmedValue);
+    if (!restartConsent) {
+      assistantAppendBotMessageWithTyping('Pour confirmer, réponds seulement Oui ou Non.', false, 320);
+      assistantSetConsentPrompt();
+      return;
+    }
+
+    assistantState.awaitingRestartConfirm = false;
+
+    if (restartConsent === 'yes') {
+      assistantResetSession(true);
+      return;
+    }
+
+    assistantAppendBotMessageWithTyping('Parfait, on continue le formulaire en cours.', false, 300);
+
+    if (assistantState.restoreBusyAfterRestartConfirm) {
+      assistantState.restoreBusyAfterRestartConfirm = false;
+      assistantSetBusy(true);
+      if (assistantElements.input) assistantElements.input.placeholder = 'Questionnaire complété';
+      return;
+    }
+
+    assistantState.restoreBusyAfterRestartConfirm = false;
+    if (assistantState.waitingStartConsent) {
+      assistantSetConsentPrompt();
+      assistantSetTimer(function() {
+        assistantAppendBotMessageWithTyping('Veux-tu commencer le remplissage du formulaire ? <span class="ai-question-format">Réponse: Oui ou Non</span>', true, 220);
+      }, 180);
+      return;
+    }
+
+    var ongoingStep = assistantCurrentStep();
+    assistantSetInputPrompt(ongoingStep);
+    assistantSetTimer(function() {
+      assistantAskStepQuestion(ongoingStep);
+    }, 180);
+    return;
+  }
+
   if (assistantState.waitingStartConsent) {
     var consent = assistantNormalizeChoice(trimmedValue);
     if (!consent) {
@@ -567,6 +628,7 @@ function initAssistant() {
   assistantElements.input = assistantElements.root.querySelector('.ai-assistant-input input');
   assistantElements.sendButton = assistantElements.root.querySelector('.ai-assistant-input button');
   assistantElements.applyButton = assistantElements.root.querySelector('.ai-assistant-primary');
+  assistantElements.resetButton = assistantElements.root.querySelector('.ai-assistant-reset');
   assistantElements.toggleButton = assistantElements.root.querySelector('.ai-assistant-toggle');
 
   if (!assistantElements.chat || !assistantElements.input || !assistantElements.sendButton || !assistantElements.applyButton) return;
@@ -582,6 +644,13 @@ function initAssistant() {
     assistantElements.toggleButton.setAttribute('aria-label', 'Réduire ou ouvrir l’assistant');
     assistantElements.toggleButton.addEventListener('click', function() {
       assistantSetCollapsed(!assistantElements.root.classList.contains('is-collapsed'));
+    });
+  }
+
+  if (assistantElements.resetButton) {
+    assistantElements.resetButton.setAttribute('aria-label', 'Recommencer le questionnaire');
+    assistantElements.resetButton.addEventListener('click', function() {
+      assistantRequestRestartConfirmation();
     });
   }
 
@@ -637,6 +706,16 @@ function setLimitFieldsVisibility(panel, shouldShow, instant) {
 
   if (instant) {
     panel.classList.toggle('is-hidden', !shouldShow);
+    panel.style.height = '';
+    panel.style.opacity = '';
+    panel.style.transform = '';
+    panel.style.transition = '';
+    panel.style.overflow = '';
+    return;
+  }
+
+  var isCurrentlyVisible = !panel.classList.contains('is-hidden');
+  if (isCurrentlyVisible === shouldShow) {
     panel.style.height = '';
     panel.style.opacity = '';
     panel.style.transform = '';

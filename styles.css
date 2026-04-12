@@ -43,6 +43,14 @@
   --footer-logo-copilot-filter: brightness(0) saturate(100%) invert(74%) sepia(28%) saturate(1194%) hue-rotate(224deg) brightness(102%) contrast(98%);
   --grid-line-opacity: 0.037;
   --assistant-footer-safe-space: 0px;
+  --ui-shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.24), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --ui-shadow-input: 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  --ui-shadow-panel: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --ui-shadow-bubble: 0 3px 10px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --ui-shadow-bubble-light: 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  --ui-text-shadow-header: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --calc-display-bg: color-mix(in oklab, var(--surface2) 72%, #0a121b 28%);
+  --calc-display-border: color-mix(in oklab, var(--border) 62%, #2f3f4f 38%);
 }
 
 @media (prefers-color-scheme: light) {
@@ -105,6 +113,14 @@
   --footer-logo-claude-filter: brightness(0) saturate(100%) invert(41%) sepia(74%) saturate(1777%) hue-rotate(357deg) brightness(98%) contrast(94%);
   --footer-logo-copilot-filter: brightness(0) saturate(100%) invert(38%) sepia(24%) saturate(1893%) hue-rotate(233deg) brightness(93%) contrast(95%);
   --grid-line-opacity: 0.034;
+  --ui-shadow-soft: 0 1px 4px rgba(20, 49, 73, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.44);
+  --ui-shadow-input: 0 1px 2px rgba(20, 49, 73, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+  --ui-shadow-panel: 0 5px 14px rgba(20, 49, 73, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+  --ui-shadow-bubble: 0 2px 7px rgba(20, 49, 73, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+  --ui-shadow-bubble-light: 0 1px 2px rgba(20, 49, 73, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+  --ui-text-shadow-header: 0 1px 2px rgba(20, 49, 73, 0.08);
+  --calc-display-bg: color-mix(in oklab, var(--surface2) 64%, #c2cfdd 36%);
+  --calc-display-border: color-mix(in oklab, var(--border) 58%, #90a9bf 42%);
 }
 
 :root.light-mode input[type="number"]:focus,
@@ -113,7 +129,7 @@
 }
 
 :root.light-mode .btn-calc:hover {
-  box-shadow: none;
+  box-shadow: 0 6px 16px rgba(23, 88, 122, 0.18);
 }
 
 :root.dark-mode {
@@ -170,7 +186,7 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: "Syne", sans-serif;
+  font-family: "Montserrat", sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
   transition:
@@ -194,14 +210,14 @@ body::before {
 .container {
   max-width: 960px;
   margin: 0 auto;
-  padding: 48px 24px;
+  padding: 56px 28px;
 }
 
 .container.app-shell {
   max-width: 960px;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 30px;
   align-items: start;
   margin: 0 auto;
 }
@@ -250,6 +266,44 @@ body::before {
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.ai-assistant-reset {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklab, var(--border) 55%, #c4ccd5 45%);
+  background: linear-gradient(180deg, #45515f, #33404d);
+  color: #eef3f7;
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.ai-assistant-reset-icon {
+  width: 15px;
+  height: 15px;
+  display: block;
+  pointer-events: none;
+  filter: brightness(0) invert(1);
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  font-size: 0;
+  object-fit: contain;
+  object-position: center;
+  transform: translateX(-0.5px);
+  flex-shrink: 0;
+}
+
+.ai-assistant-reset:hover {
+  background: linear-gradient(180deg, #546170, #3e4b59);
+  border-color: color-mix(in oklab, var(--border) 40%, #d5dbe2 60%);
+  transform: translateY(-1px);
 }
 
 .ai-assistant-kicker {
@@ -301,6 +355,7 @@ body::before {
   letter-spacing: 0.8px;
   text-transform: uppercase;
   cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
@@ -405,7 +460,7 @@ body::before {
   line-height: 1.5;
   border: 1px solid var(--border);
   max-width: 88%;
-  box-shadow: none;
+  box-shadow: var(--ui-shadow-bubble-light);
 }
 
 .ai-message-bot .ai-message-bubble {
@@ -419,6 +474,10 @@ body::before {
   font-size: 11px;
   font-weight: 600;
   color: color-mix(in oklab, var(--accent) 72%, #bfefff 28%);
+}
+
+.ai-question-format-warn {
+  color: color-mix(in oklab, var(--accent2) 78%, #ffd36a 22%);
 }
 
 .ai-message-user {
@@ -634,6 +693,10 @@ body::before {
   margin: 0;
 }
 
+.ai-assistant.is-collapsed .ai-assistant-reset {
+  display: none;
+}
+
 .ai-assistant.is-collapsed .ai-assistant-toggle {
   width: 100%;
   height: 100%;
@@ -696,6 +759,27 @@ body::before {
   border-color: #bfd2e0;
 }
 
+:root.light-mode .ai-assistant-reset {
+  background: linear-gradient(180deg, #e8eef4, #dce5ee);
+  border-color: #a6b8c9;
+  color: #3f5163;
+  box-shadow: 0 1px 2px rgba(20, 49, 73, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+
+:root.light-mode .ai-assistant-toggle {
+  box-shadow: 0 1px 2px rgba(20, 49, 73, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+
+:root.light-mode .ai-assistant-reset-icon {
+  filter: brightness(0) saturate(100%) invert(30%) sepia(11%) saturate(893%) hue-rotate(168deg) brightness(95%) contrast(90%);
+}
+
+:root.light-mode .ai-assistant-reset:hover {
+  background: linear-gradient(180deg, #f0f4f8, #e3ebf3);
+  border-color: #94a9bd;
+  color: #304457;
+}
+
 :root.light-mode .ai-message-bot::before {
   background: linear-gradient(180deg, #dcecf9, #b9d3e8);
   background-image: url("https://img.icons8.com/?size=100&id=mi1244VYhYl6&format=png&color=0F172A");
@@ -732,6 +816,14 @@ body::before {
   background: linear-gradient(180deg, #b7e1ff, #8bc9f6);
   border-color: #2d84bf;
   color: #0a2b43;
+}
+
+:root.light-mode .ai-question-format {
+  color: #0f6f69;
+}
+
+:root.light-mode .ai-question-format.ai-question-format-warn {
+  color: #a06300;
 }
 
 :root.light-mode .ai-message.ai-message-info.ai-message-bot::before {
@@ -777,7 +869,7 @@ body::before {
 }
 
 header {
-  margin-bottom: 48px;
+  margin-bottom: 56px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -796,6 +888,7 @@ header {
   border-radius: 20px;
   padding: 8px 12px;
   cursor: pointer;
+  box-shadow: var(--ui-shadow-soft);
   transition: all 0.2s ease;
   user-select: none;
 }
@@ -849,12 +942,14 @@ header {
   text-transform: uppercase;
   color: var(--accent);
   margin-bottom: 12px;
+  text-shadow: var(--ui-text-shadow-header);
 }
 
 h1 {
   font-family: "DM Serif Display", serif;
   font-size: clamp(2rem, 5vw, 3.2rem);
   line-height: 1.1;
+  text-shadow: var(--ui-text-shadow-header);
 }
 
 h1 em {
@@ -868,14 +963,16 @@ h1 em {
   font-size: 14px;
   max-width: 500px;
   line-height: 1.6;
+  text-shadow: var(--ui-text-shadow-header);
 }
 
 .form-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 36px;
-  margin-bottom: 32px;
+  padding: 40px;
+  margin-bottom: 40px;
+  box-shadow: var(--ui-shadow-panel);
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
@@ -888,7 +985,7 @@ h1 em {
   text-transform: uppercase;
   color: var(--accent);
   font-family: "DM Sans", sans-serif;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -916,21 +1013,21 @@ h1 em {
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 24px;
   align-items: start;
 }
 
 .grid-3 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
+  gap: 24px;
   align-items: start;
 }
 
 .account-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  gap: 24px;
   align-items: stretch;
 }
 
@@ -938,10 +1035,11 @@ h1 em {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   height: 100%;
+  box-shadow: var(--ui-shadow-soft);
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
@@ -951,7 +1049,7 @@ h1 em {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .account-badge {
@@ -980,7 +1078,7 @@ h1 em {
 
 .account-panel .grid-2 {
   grid-template-columns: 1fr;
-  gap: 14px;
+  gap: 16px;
 }
 
 .account-panel .field {
@@ -1121,7 +1219,7 @@ h1 em {
     grid-template-columns: 1fr;
   }
   .form-card {
-    padding: 24px 20px;
+    padding: 26px 22px;
   }
   .calc-display {
     height: auto;
@@ -1145,7 +1243,7 @@ h1 em {
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   height: 100%;
 }
 
@@ -1189,6 +1287,7 @@ input[type="number"], input[type="text"] {
   transition:
     border-color 0.2s,
     box-shadow 0.2s;
+  box-shadow: var(--ui-shadow-input);
   appearance: textfield;
   -moz-appearance: textfield;
 }
@@ -1210,7 +1309,7 @@ input[type="text"]:focus {
   font-size: 11px;
   color: var(--muted);
   font-style: italic;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .calc-label {
@@ -1224,8 +1323,8 @@ input[type="text"]:focus {
 }
 
 .calc-display {
-  background: var(--surface2);
-  border: 1px solid var(--border);
+  background: var(--calc-display-bg);
+  border: 1px solid var(--calc-display-border);
   border-radius: 8px;
   padding: 12px 14px;
   display: flex;
@@ -1243,7 +1342,7 @@ input[type="text"]:focus {
 .divider {
   height: 1px;
   background: var(--border);
-  margin: 28px 0;
+  margin: 34px 0;
 }
 
 .info-box {
@@ -1305,7 +1404,9 @@ input[type="text"]:focus {
 .btn-calc {
   width: 100%;
   padding: 16px;
-  background: var(--accent);
+  background: linear-gradient(115deg, color-mix(in oklab, var(--accent) 88%, #7be0d8 12%) 0%, color-mix(in oklab, var(--accent) 76%, #0b4952 24%) 50%, color-mix(in oklab, var(--accent) 84%, #5fd8cd 16%) 100%);
+  background-size: 180% 180%;
+  background-position: 0% 50%;
   color: var(--bg);
   border: none;
   border-radius: 10px;
@@ -1316,19 +1417,22 @@ input[type="text"]:focus {
   text-transform: uppercase;
   cursor: pointer;
   transition:
-    background 0.2s,
+    background-position 0.5s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.15s,
-    box-shadow 0.2s;
-  margin-top: 8px;
+    box-shadow 0.2s,
+    filter 0.25s ease;
+  margin-top: 14px;
 }
 
 .btn-calc:hover {
-  background: #1f8d7f;
+  background-position: 100% 50%;
   box-shadow: 0 8px 24px rgba(43, 168, 159, 0.3);
+  filter: saturate(1.08) brightness(1.03);
   transform: translateY(-2px);
 }
 
 .btn-calc:active {
+  filter: saturate(1) brightness(1);
   transform: translateY(0);
 }
 
@@ -1361,6 +1465,7 @@ input[type="text"]:focus {
   border-radius: 18px;
   padding: 24px;
   margin-bottom: 24px;
+  box-shadow: var(--ui-shadow-panel);
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
@@ -1571,6 +1676,7 @@ input[type="text"]:focus {
   border-radius: 16px;
   padding: 32px;
   margin-bottom: 24px;
+  box-shadow: var(--ui-shadow-panel);
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
@@ -2077,6 +2183,7 @@ input[type="text"]:focus {
   border-radius: 16px;
   overflow: hidden;
   margin-bottom: 24px;
+  box-shadow: var(--ui-shadow-panel);
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
