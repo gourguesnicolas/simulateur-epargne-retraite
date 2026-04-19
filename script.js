@@ -1,3 +1,27 @@
+// --- Effacement et effet pale sur focus input (tous les champs numériques) ---
+function setupInputFocusBehavior() {
+  const inputSelectors = [
+    '#currentAge', '#retirementAge', '#endAge',
+    '#celiInitialAmount', '#celiAnnualContrib', '#celiRoomAvailable', '#celiAnnualLimit',
+    '#reerInitialAmount', '#reerAnnualContrib', '#reerIncome', '#reerRoomAvailable', '#reerRoomRate', '#reerAnnualCap',
+    '#nonRegInitialAmount', '#nonRegAnnualContrib',
+    '#contribGrowth', '#growthRate',
+    '#employerPension1Amount', '#employerPension1IndexRate', '#employerPension1StartAge', '#employerPension1EndAge',
+    '#employerPension2Amount', '#employerPension2IndexRate', '#employerPension2StartAge', '#employerPension2EndAge',
+    '#annualWithdrawal', '#retirGrowthRate', '#inflation',
+    '#rrqBase', '#rrqAge', '#rrqIndexRate',
+    '#psvBase', '#psvYears', '#psvAge', '#psvIndexRate'
+  ];
+  inputSelectors.forEach(sel => {
+    const input = document.querySelector(sel);
+    if (!input) return;
+    input.addEventListener('focus', function(e) {
+      input.select();
+    });
+  });
+}
+
+window.addEventListener('DOMContentLoaded', setupInputFocusBehavior);
 var allData = [];
 var showAll = false;
 var simulationSummary = {
@@ -8,6 +32,436 @@ var simulationSummary = {
     reer: true
   }
 };
+
+var simulationTabsState = {
+  tabs: [],
+  activeTabId: null,
+  nextLabelIndex: 1
+};
+
+var simulationTabsAnimationState = {
+  action: null,
+  tabId: null,
+  fromTabId: null
+};
+
+var simulationTabsLayout = {
+  containerWidth: 0,
+  maxTabsLimit: 7
+};
+
+function calculateTabsLimit() {
+  var tabsRoot = document.getElementById('simulationTabs');
+  if (!tabsRoot) return 9;
+  
+  // Limiter à 3 onglets sur mobile (max-width: 640px)
+  var isMobile = window.matchMedia('(max-width: 640px)').matches;
+  if (isMobile) {
+    simulationTabsLayout.maxTabsLimit = 3;
+    return 3;
+  }
+  
+  // Limiter à 6 onglets sur tablette (641px à 1024px)
+  var isTablet = window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches;
+  if (isTablet) {
+    simulationTabsLayout.maxTabsLimit = 6;
+    return 6;
+  }
+  
+  // Limiter à 8 onglets sur desktop (1025px+)
+  simulationTabsLayout.maxTabsLimit = 8;
+  return 8;
+}
+
+function getSimulationTabsLimit() {
+  return simulationTabsLayout.maxTabsLimit;
+}
+
+function getActiveSimulationTab() {
+  for (var i = 0; i < simulationTabsState.tabs.length; i++) {
+    if (simulationTabsState.tabs[i].id === simulationTabsState.activeTabId) {
+      return simulationTabsState.tabs[i];
+    }
+  }
+  return null;
+}
+
+function getNumericInputElements() {
+  return document.querySelectorAll('input[type="text"][inputmode="decimal"][id]');
+}
+
+
+function createDefaultFormState() {
+  // Tous les champs numériques initialisés à 0
+  return {
+    currentAge: 0,
+    retirementAge: 0,
+    endAge: 0,
+    celiInitialAmount: 0,
+    celiAnnualContrib: 0,
+    celiRoomAvailable: 0,
+    celiAnnualLimit: 0,
+    reerInitialAmount: 0,
+    reerAnnualContrib: 0,
+    reerIncome: 0,
+    reerRoomAvailable: 0,
+    reerRoomRate: 0,
+    reerAnnualCap: 0,
+    nonRegInitialAmount: 0,
+    nonRegAnnualContrib: 0,
+    contribGrowth: 0,
+    growthRate: 0,
+    employerPension1Amount: 0,
+    employerPension1IndexRate: 0,
+    employerPension1StartAge: 0,
+    employerPension1EndAge: 0,
+    employerPension2Amount: 0,
+    employerPension2IndexRate: 0,
+    employerPension2StartAge: 0,
+    employerPension2EndAge: 0,
+    annualWithdrawal: 0,
+    retirGrowthRate: 0,
+    inflation: 0,
+    rrqBase: 0,
+    rrqAge: 0,
+    rrqIndexRate: 0,
+    psvBase: 0,
+    psvYears: 0,
+    psvAge: 0,
+    psvIndexRate: 0,
+    celiLimitMode: 'no',
+    reerLimitMode: 'no',
+    employerPension1Mode: 'no', // SANS par défaut
+    employerPension2Mode: 'no'  // SANS par défaut
+  };
+}
+
+function collectCurrentFormState() {
+  var state = {};
+  var inputs = getNumericInputElements();
+  for (var i = 0; i < inputs.length; i++) {
+    state[inputs[i].id] = getNumericValue(inputs[i].id, 0);
+  }
+  state.celiLimitMode = getLimitMode('celiLimitMode');
+  state.reerLimitMode = getLimitMode('reerLimitMode');
+  state.employerPension1Mode = getLimitMode('employerPension1Mode');
+  state.employerPension2Mode = getLimitMode('employerPension2Mode');
+  return state;
+}
+
+function applyFormState(state) {
+  var safeState = state || createDefaultFormState();
+  var inputs = getNumericInputElements();
+
+  for (var i = 0; i < inputs.length; i++) {
+    var input = inputs[i];
+    var value = safeState[input.id];
+    if (value == null || isNaN(value)) value = 0;
+    input.value = String(value);
+    formatNumericInput(input);
+  }
+
+  var celiMode = safeState.celiLimitMode === 'yes' ? 'yes' : 'no';
+  var reerMode = safeState.reerLimitMode === 'yes' ? 'yes' : 'no';
+  var employerPension1Mode = safeState.employerPension1Mode === 'yes' ? 'yes' : 'no';
+  var employerPension2Mode = safeState.employerPension2Mode === 'yes' ? 'yes' : 'no';
+
+  var celiRadio = document.querySelector('input[name="celiLimitMode"][value="' + celiMode + '"]');
+  var reerRadio = document.querySelector('input[name="reerLimitMode"][value="' + reerMode + '"]');
+  var employerPension1Radio = document.querySelector('input[name="employerPension1Mode"][value="' + employerPension1Mode + '"]');
+  var employerPension2Radio = document.querySelector('input[name="employerPension2Mode"][value="' + employerPension2Mode + '"]');
+  if (celiRadio) celiRadio.checked = true;
+  if (reerRadio) reerRadio.checked = true;
+  if (employerPension1Radio) employerPension1Radio.checked = true;
+  if (employerPension2Radio) employerPension2Radio.checked = true;
+
+  syncLimitFieldsVisibility({ instant: true });
+  updateRrq();
+  updatePsv();
+}
+
+function cloneFormState(state) {
+  return JSON.parse(JSON.stringify(state || {}));
+}
+
+function sameFormState(a, b) {
+  if (!a || !b) return false;
+  var aKeys = Object.keys(a);
+  var bKeys = Object.keys(b);
+  if (aKeys.length !== bKeys.length) return false;
+  for (var i = 0; i < aKeys.length; i++) {
+    var key = aKeys[i];
+    if (a[key] !== b[key]) return false;
+  }
+  return true;
+}
+
+function persistActiveSimulationTabState() {
+  var activeTab = getActiveSimulationTab();
+  if (!activeTab) return;
+
+  activeTab.formState = collectCurrentFormState();
+  activeTab.showAll = showAll;
+}
+
+function renderSimulationTabs() {
+  var tabsRoot = document.getElementById('simulationTabs');
+  if (!tabsRoot) return;
+  
+  // Recalculer la limite basée sur la largeur actuelle du conteneur
+  calculateTabsLimit();
+  
+  var maxTabs = getSimulationTabsLimit();
+  var canAddTab = simulationTabsState.tabs.length < maxTabs;
+  var canRemoveTab = simulationTabsState.tabs.length > 1;
+
+  tabsRoot.innerHTML = '';
+
+  for (var i = 0; i < simulationTabsState.tabs.length; i++) {
+    var tab = simulationTabsState.tabs[i];
+    var isActive = tab.id === simulationTabsState.activeTabId;
+    var tabItem = document.createElement('div');
+    tabItem.className = 'simulation-tab-item' + (isActive ? ' is-active' : ' is-inactive');
+    tabItem.style.zIndex = String(simulationTabsState.tabs.length - i);
+
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'simulation-tab' + (isActive ? ' is-active' : ' is-inactive');
+    if (!canRemoveTab) {
+      button.classList.add('is-no-close-button');
+    }
+    if (simulationTabsAnimationState.action === 'switch' && isActive) {
+      button.classList.add('is-switching');
+    }
+    if (simulationTabsAnimationState.action === 'switch' && simulationTabsAnimationState.fromTabId === tab.id) {
+      button.classList.add('is-switching-out');
+    }
+    if (simulationTabsAnimationState.action === 'add' && simulationTabsAnimationState.tabId === tab.id) {
+      button.classList.add('is-appearing');
+    }
+    if (button.classList.contains('is-switching') || button.classList.contains('is-switching-out') || button.classList.contains('is-appearing')) {
+      button.addEventListener('animationend', function(event) {
+        event.currentTarget.classList.remove('is-switching', 'is-switching-out', 'is-appearing');
+      }, { once: true });
+    }
+    button.textContent = tab.label;
+    button.dataset.tabId = String(tab.id);
+    button.addEventListener('click', function(event) {
+      var targetId = parseInt(event.currentTarget.dataset.tabId, 10);
+      if (!isNaN(targetId)) {
+        setActiveSimulationTab(targetId);
+      }
+    });
+
+    var closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'simulation-tab-close' + (!canRemoveTab ? ' is-hidden' : '');
+    closeButton.textContent = '';
+    closeButton.setAttribute('aria-label', 'Fermer cet onglet');
+    closeButton.title = canRemoveTab ? 'Fermer cet onglet' : 'Au moins un onglet doit rester ouvert';
+    closeButton.disabled = !canRemoveTab;
+    closeButton.dataset.tabId = String(tab.id);
+    closeButton.addEventListener('click', function(event) {
+      event.stopPropagation();
+      var targetId = parseInt(event.currentTarget.dataset.tabId, 10);
+      if (!isNaN(targetId)) {
+        deleteSimulationTabById(targetId);
+      }
+    });
+
+    tabItem.appendChild(button);
+    tabItem.appendChild(closeButton);
+    tabsRoot.appendChild(tabItem);
+  }
+
+  var addButton = document.createElement('button');
+  addButton.type = 'button';
+  addButton.className = 'simulation-tab-add';
+  if (simulationTabsAnimationState.action === 'add') {
+    addButton.classList.add('is-plus-feedback');
+  }
+  addButton.textContent = '';
+  addButton.setAttribute('aria-label', 'Ajouter une simulation');
+  addButton.disabled = !canAddTab;
+  addButton.title = canAddTab ? 'Ajouter une simulation' : 'Limite atteinte pour ce format d\'écran';
+  if (canAddTab) {
+    addButton.addEventListener('click', function() {
+      createSimulationTab();
+    });
+  }
+  tabsRoot.appendChild(addButton);
+
+  simulationTabsAnimationState.action = null;
+  simulationTabsAnimationState.tabId = null;
+  simulationTabsAnimationState.fromTabId = null;
+}
+
+function deleteSimulationTabById(tabId) {
+  if (simulationTabsState.tabs.length <= 1) {
+    renderSimulationTabs();
+    return;
+  }
+
+  var activeTab = getActiveSimulationTab();
+  if (activeTab && activeTab.id === tabId) {
+    persistActiveSimulationTabState();
+  }
+
+  var removeIndex = -1;
+  for (var i = 0; i < simulationTabsState.tabs.length; i++) {
+    if (simulationTabsState.tabs[i].id === tabId) {
+      removeIndex = i;
+      break;
+    }
+  }
+  if (removeIndex === -1) return;
+
+  var wasActive = simulationTabsState.activeTabId === tabId;
+  simulationTabsState.tabs.splice(removeIndex, 1);
+
+  if (!wasActive) {
+    renderSimulationTabs();
+    return;
+  }
+
+  var nextIndex = Math.max(0, removeIndex - 1);
+  if (nextIndex >= simulationTabsState.tabs.length) {
+    nextIndex = simulationTabsState.tabs.length - 1;
+  }
+
+  var nextTab = simulationTabsState.tabs[nextIndex];
+  if (!nextTab) {
+    renderSimulationTabs();
+    return;
+  }
+
+  simulationTabsState.activeTabId = null;
+  setActiveSimulationTab(nextTab.id, { fromDelete: true });
+}
+
+function animateSimulationTabSwitch() {
+  var formCard = document.querySelector('.form-card');
+  var resultsEl = document.getElementById('results');
+
+  if (formCard) {
+    formCard.classList.remove('is-tab-switching');
+    void formCard.offsetWidth;
+    formCard.classList.add('is-tab-switching');
+    setTimeout(function() {
+      formCard.classList.remove('is-tab-switching');
+    }, 340);
+  }
+
+  if (resultsEl && resultsEl.style.display !== 'none') {
+    resultsEl.classList.remove('is-tab-switching');
+    void resultsEl.offsetWidth;
+    resultsEl.classList.add('is-tab-switching');
+    setTimeout(function() {
+      resultsEl.classList.remove('is-tab-switching');
+    }, 340);
+  }
+}
+
+function setActiveSimulationTab(tabId, options) {
+  var settings = options || {};
+  if (simulationTabsState.activeTabId === tabId) return;
+
+  var previousTabId = simulationTabsState.activeTabId;
+
+  persistActiveSimulationTabState();
+
+  simulationTabsState.activeTabId = tabId;
+  simulationTabsAnimationState.action = settings.fromAdd ? 'add' : 'switch';
+  simulationTabsAnimationState.tabId = settings.fromAdd ? tabId : null;
+  simulationTabsAnimationState.fromTabId = settings.fromAdd ? null : previousTabId;
+  var activeTab = getActiveSimulationTab();
+  if (!activeTab) return;
+
+  animateSimulationTabSwitch();
+
+  showAll = !!activeTab.showAll;
+  applyFormState(activeTab.formState);
+  renderSimulationTabs();
+
+  var resultsEl = document.getElementById('results');
+  if (!resultsEl) return;
+
+  var canRestoreResults = activeTab.hasResults && sameFormState(activeTab.formState, activeTab.resultFormState);
+  if (canRestoreResults) {
+    var ok = calculate(false, { silentValidation: true });
+    if (!ok) {
+      activeTab.hasResults = false;
+      activeTab.resultFormState = null;
+      allData = [];
+      resultsEl.style.display = 'none';
+    }
+    return;
+  }
+
+  allData = [];
+  resultsEl.style.display = 'none';
+}
+
+function createSimulationTab() {
+  if (simulationTabsState.tabs.length >= getSimulationTabsLimit()) {
+    renderSimulationTabs();
+    return;
+  }
+
+  persistActiveSimulationTabState();
+
+  var id = Date.now() + Math.floor(Math.random() * 1000);
+  var label = 'SIMUL ' + simulationTabsState.nextLabelIndex;
+  simulationTabsState.nextLabelIndex += 1;
+
+  simulationTabsState.tabs.push({
+    id: id,
+    label: label,
+    formState: createDefaultFormState(),
+    resultFormState: null,
+    hasResults: false,
+    showAll: false
+  });
+
+  setActiveSimulationTab(id, { fromAdd: true });
+}
+
+function initSimulationTabs() {
+  var tabsRoot = document.getElementById('simulationTabs');
+  if (!tabsRoot) return;
+
+  var firstTabId = Date.now();
+  simulationTabsState.tabs = [{
+    id: firstTabId,
+    label: 'SIMUL 1',
+    formState: createDefaultFormState(),
+    resultFormState: null,
+    hasResults: false,
+    showAll: false
+  }];
+  simulationTabsState.activeTabId = firstTabId;
+  simulationTabsState.nextLabelIndex = 2;
+  simulationTabsAnimationState.action = null;
+  simulationTabsAnimationState.tabId = null;
+
+  applyFormState(simulationTabsState.tabs[0].formState);
+  
+  // Render initial des onglets (calculateTabsLimit sera appelé dedans)
+  renderSimulationTabs();
+
+  // ResizeObserver pour adapter le nombre d'onglets à la largeur du conteneur
+  if (window.ResizeObserver) {
+    var tabsRoot = document.getElementById('simulationTabs');
+    if (tabsRoot) {
+      var observer = new ResizeObserver(function() {
+        renderSimulationTabs();
+      });
+      observer.observe(tabsRoot);
+    }
+  }
+
+  window.addEventListener('resize', renderSimulationTabs);
+}
 
 var assistantState = {
   stepIndex: 0,
@@ -35,12 +489,13 @@ var assistantBaseSteps = [
   { field: 'reerAnnualContrib', label: 'Quel montant veux-tu cotiser chaque année dans le REER ?', type: 'number', placeholder: '2000' },
   { field: 'nonRegAnnualContrib', label: 'Quel montant veux-tu cotiser chaque année dans le compte non enregistré ?', type: 'number', placeholder: '1000' },
   { field: 'contribGrowth', label: 'De combien veux-tu augmenter tes cotisations chaque année ?', type: 'number', placeholder: '2' },
-  { field: 'annualWithdrawal', label: 'Quel retrait annuel souhaites-tu à la retraite ?', type: 'number', placeholder: '36000' },
   { field: 'growthRate', label: 'Quel rendement annuel veux-tu jusqu\'à ta retraite ?', type: 'number', placeholder: '3.5' },
-  { field: 'retirGrowthRate', label: 'Quel rendement annuel veux-tu à la retraite ?', type: 'number', placeholder: '2.5' },
-  { field: 'inflation', label: 'Quelle elle le pourcentage d\'inflation annuelle que tu prévoit durant ta retraite (pour indexer tes retraits) ?', type: 'number', placeholder: '2' },
   { field: 'celiLimitMode', label: 'Veux-tu appliquer les limites de cotisation CELI ?', type: 'choice', choices: ['yes', 'no'], placeholder: 'non' },
   { field: 'reerLimitMode', label: 'Veux-tu appliquer les limites de cotisation REER ?', type: 'choice', choices: ['yes', 'no'], placeholder: 'non' },
+  { field: 'employerPension1Mode', label: 'As-tu un régime d\'épargne retraite avec ton employeur ?', type: 'choice', choices: ['yes', 'no'], placeholder: 'non' },
+  { field: 'annualWithdrawal', label: 'Quel retrait annuel souhaites-tu à la retraite ?', type: 'number', placeholder: '36000' },
+  { field: 'retirGrowthRate', label: 'Quel rendement annuel veux-tu à la retraite ?', type: 'number', placeholder: '2.5' },
+  { field: 'inflation', label: 'Quelle elle le pourcentage d\'inflation annuelle que tu prévoit durant ta retraite (pour indexer tes retraits) ?', type: 'number', placeholder: '2' },
   { field: 'rrqBase', label: 'Quel est le montant de ta rente de base RRQ (par année) ?', type: 'number', placeholder: '10125' },
   { field: 'rrqAge', label: 'À quel âge veux-tu commencer la RRQ ?', type: 'number', placeholder: '65' },
   { field: 'rrqIndexRate', label: 'Quel taux d\'indexation annuelle veux-tu utiliser pour la RRQ ?', type: 'number', placeholder: '2.0' },
@@ -60,6 +515,19 @@ var assistantConditionalStepGroups = {
     { field: 'reerRoomAvailable', label: 'Quels sont les droits de cotisations disponibles pour ton REER ?', type: 'number', placeholder: '15000' },
     { field: 'reerRoomRate', label: 'Quel est le taux de droit de cotisation en vigueur pour ton REER ?', type: 'number', placeholder: '18' },
     { field: 'reerAnnualCap', label: 'Quel est le montant du plafond annuel en vigueur pour ton REER ?', type: 'number', placeholder: '33000' }
+  ],
+  employerPension1Mode: [
+    { field: 'employerPension1Amount', label: 'Quel est le montant annuel que tu recevras avec le régime de retraite de ton employeur ?', type: 'number', placeholder: '0' },
+    { field: 'employerPension1IndexRate', label: 'Quel taux d\'indexation annuelle veux-tu utiliser pour ton régime de retraite avec ton employeur ?', type: 'number', placeholder: '0' },
+    { field: 'employerPension1StartAge', label: 'À quel âge commenceras-tu à recevoir des montants avec ce régime de retraite ?', type: 'number', placeholder: '0' },
+    { field: 'employerPension1EndAge', label: 'Jusqu’à quel âge recevras-tu de l\'argent avec ce régime de retraite ?', type: 'number', placeholder: '0' },
+    { field: 'employerPension2Mode', label: 'As-tu un deuxième régime d\'épargne retraite avec un employeur ?', type: 'choice', choices: ['yes', 'no'], placeholder: 'non' }
+  ],
+  employerPension2Mode: [
+    { field: 'employerPension2Amount', label: 'Quel est le montant annuel que tu recevras avec le régime de retraite de cet employeur ?', type: 'number', placeholder: '0' },
+    { field: 'employerPension2IndexRate', label: 'Quel taux d\'indexation annuelle veux-tu utiliser pour ton régime de retraite avec cet employeur ?', type: 'number', placeholder: '0' },
+    { field: 'employerPension2StartAge', label: 'À quel âge commenceras-tu à recevoir des montants avec ce deuxième régime de retraite ?', type: 'number', placeholder: '0' },
+    { field: 'employerPension2EndAge', label: 'Jusqu’à quel âge recevras-tu de l\'argent avec ce deuxième régime de retraite ?', type: 'number', placeholder: '0' }
   ]
 };
 
@@ -183,7 +651,9 @@ function assistantQuestionForStep(step, options) {
     inflation: true,
     reerRoomRate: true,
     rrqIndexRate: true,
-    psvIndexRate: true
+    psvIndexRate: true,
+    employerPension1IndexRate: true,
+    employerPension2IndexRate: true
   };
   var ageFields = {
     currentAge: true,
@@ -191,7 +661,11 @@ function assistantQuestionForStep(step, options) {
     endAge: true,
     rrqAge: true,
     psvYears: true,
-    psvAge: true
+    psvAge: true,
+    employerPension1StartAge: true,
+    employerPension1EndAge: true,
+    employerPension2StartAge: true,
+    employerPension2EndAge: true
   };
   var annualDollarFields = {
     celiAnnualContrib: true,
@@ -202,7 +676,9 @@ function assistantQuestionForStep(step, options) {
     psvBase: true,
     celiAnnualLimit: true,
     reerIncome: true,
-    reerAnnualCap: true
+    reerAnnualCap: true,
+    employerPension1Amount: true,
+    employerPension2Amount: true
   };
 
   var expectedFormat = 'Réponse en $ (nombre)';
@@ -481,7 +957,7 @@ function assistantApplyCollectedValues() {
       continue;
     }
 
-    if (field === 'celiLimitMode' || field === 'reerLimitMode') {
+    if (field === 'celiLimitMode' || field === 'reerLimitMode' || field === 'employerPension1Mode' || field === 'employerPension2Mode') {
       var radio = document.querySelector('input[name="' + field + '"][value="' + value + '"]');
       if (radio) radio.checked = true;
     }
@@ -725,7 +1201,7 @@ function setLimitFieldsVisibility(panel, shouldShow, instant) {
   }
 
   panel.style.overflow = 'hidden';
-  panel.style.transition = 'height 280ms ease, opacity 220ms ease, transform 280ms ease';
+  panel.style.transition = 'height 320ms cubic-bezier(0.4, 0, 0.2, 1), opacity 260ms cubic-bezier(0.4, 0, 0.2, 1), transform 320ms cubic-bezier(0.4, 0, 0.2, 1)';
 
   if (shouldShow) {
     panel.classList.remove('is-hidden');
@@ -785,23 +1261,25 @@ function syncLimitFieldsVisibility(options) {
   var instant = !!(options && options.instant);
   var celiEnabled = getLimitMode('celiLimitMode') === 'yes';
   var reerEnabled = getLimitMode('reerLimitMode') === 'yes';
+  var employerPension1Enabled = getLimitMode('employerPension1Mode') === 'yes';
+  var employerPension2Enabled = getLimitMode('employerPension2Mode') === 'yes';
 
   var celiFields = document.getElementById('celiLimitFields');
   var reerFields = document.getElementById('reerLimitFields');
+  var employerPension1Fields = document.getElementById('employerPension1Fields');
+  var employerPension2Fields = document.getElementById('employerPension2Fields');
 
   setLimitFieldsVisibility(celiFields, celiEnabled, instant);
   setLimitFieldsVisibility(reerFields, reerEnabled, instant);
+  setLimitFieldsVisibility(employerPension1Fields, employerPension1Enabled, instant);
+  setLimitFieldsVisibility(employerPension2Fields, employerPension2Enabled, instant);
 }
 
 function initLimitControls() {
-  var controls = document.querySelectorAll('input[name="celiLimitMode"], input[name="reerLimitMode"]');
+  var controls = document.querySelectorAll('input[name="celiLimitMode"], input[name="reerLimitMode"], input[name="employerPension1Mode"], input[name="employerPension2Mode"]');
   for (var i = 0; i < controls.length; i++) {
     controls[i].addEventListener('change', function() {
       syncLimitFieldsVisibility();
-      var results = document.getElementById('results');
-      if (results && results.style.display === 'block') {
-        calculate();
-      }
     });
   }
   syncLimitFieldsVisibility({ instant: true });
@@ -984,7 +1462,23 @@ function updatePsv() {
   document.getElementById('psvFinal').textContent = '= ' + Math.round(finalAnnual) + ' $/an';
 }
 
-function calculate(focusResults) {
+function getIndexedPensionAnnual(amountId, indexRateId, startAgeId, endAgeId, age) {
+  var amount = Math.max(0, getNumericValue(amountId, 0));
+  if (amount <= 0) return 0;
+
+  var indexRate = Math.max(0, getNumericValue(indexRateId, 0)) / 100;
+  var startAge = Math.max(0, Math.round(getNumericValue(startAgeId, 0)));
+  var endAgeRaw = Math.round(getNumericValue(endAgeId, 0));
+  var endAge = endAgeRaw > 0 ? endAgeRaw : Infinity;
+
+  if (age < startAge || age > endAge) return 0;
+
+  var indexedYears = Math.max(0, age - startAge);
+  return amount * Math.pow(1 + indexRate, indexedYears);
+}
+
+function calculate(focusResults, options) {
+  var settings = options || {};
   var shouldFocusResults = focusResults === true;
   var currentAge    = Math.round(getNumericValue('currentAge', 0));
   var retirementAge = Math.round(getNumericValue('retirementAge', 0));
@@ -993,19 +1487,39 @@ function calculate(focusResults) {
   var celiInitialAmount = getNumericValue('celiInitialAmount', 0);
   var celiAnnualContrib = getNumericValue('celiAnnualContrib', 0);
   var celiLimitsEnabled = getLimitMode('celiLimitMode') === 'yes';
-  var celiRoomAvailable = getNumericValue('celiRoomAvailable', 0);
-  var celiAnnualLimit = getNumericValue('celiAnnualLimit', 7000);
+  var celiRoomAvailable = celiLimitsEnabled ? getNumericValue('celiRoomAvailable', 0) : 0;
+  var celiAnnualLimit = celiLimitsEnabled ? getNumericValue('celiAnnualLimit', 7000) : 0;
 
   var reerInitialAmount = getNumericValue('reerInitialAmount', 0);
   var reerAnnualContrib = getNumericValue('reerAnnualContrib', 0);
   var reerLimitsEnabled = getLimitMode('reerLimitMode') === 'yes';
-  var reerIncome = getNumericValue('reerIncome', 0);
-  var reerRoomAvailable = getNumericValue('reerRoomAvailable', 0);
-  var reerRoomRate = getNumericValue('reerRoomRate', 18) / 100;
-  var reerAnnualCap = getNumericValue('reerAnnualCap', 33000);
+  var reerIncome = reerLimitsEnabled ? getNumericValue('reerIncome', 0) : 0;
+  var reerRoomAvailable = reerLimitsEnabled ? getNumericValue('reerRoomAvailable', 0) : 0;
+  var reerRoomRate = reerLimitsEnabled ? (getNumericValue('reerRoomRate', 18) / 100) : 0;
+  var reerAnnualCap = reerLimitsEnabled ? getNumericValue('reerAnnualCap', 33000) : 0;
 
   var nonRegInitialAmount = getNumericValue('nonRegInitialAmount', 0);
   var nonRegAnnualContrib = getNumericValue('nonRegAnnualContrib', 0);
+
+  var employerPension1Enabled = getLimitMode('employerPension1Mode') === 'yes';
+  var employerPension2Enabled = getLimitMode('employerPension2Mode') === 'yes';
+
+  var employerPensions = [
+    {
+      enabled: employerPension1Enabled,
+      amountId: 'employerPension1Amount',
+      indexRateId: 'employerPension1IndexRate',
+      startAgeId: 'employerPension1StartAge',
+      endAgeId: 'employerPension1EndAge'
+    },
+    {
+      enabled: employerPension2Enabled,
+      amountId: 'employerPension2Amount',
+      indexRateId: 'employerPension2IndexRate',
+      startAgeId: 'employerPension2StartAge',
+      endAgeId: 'employerPension2EndAge'
+    }
+  ];
 
   var contribGrowth = getNumericValue('contribGrowth', 0) / 100;
   var annualGrowth  = getNumericValue('growthRate', 0) / 100;
@@ -1033,9 +1547,26 @@ function calculate(focusResults) {
   var psvIndexYears = Math.max(0, psvAge - 65);
   var psvAnnualAtStart  = psvBase * Math.pow(1 + psvIndexRate, psvIndexYears) * (1 + psvDefer * 0.072) * (psvYears / 40);
 
+  function getEmployerAnnualForAge(age) {
+    var annual = 0;
+    for (var i = 0; i < employerPensions.length; i++) {
+      if (!employerPensions[i].enabled) continue;
+      annual += getIndexedPensionAnnual(
+        employerPensions[i].amountId,
+        employerPensions[i].indexRateId,
+        employerPensions[i].startAgeId,
+        employerPensions[i].endAgeId,
+        age
+      );
+    }
+    return annual;
+  }
+
   if (retirementAge <= currentAge || endAge <= retirementAge) {
-    alert('Vérifiez les âges : actuel < retraite < fin');
-    return;
+    if (!settings.silentValidation) {
+      alert('Vérifiez les âges : actuel < retraite < fin');
+    }
+    return false;
   }
 
   var celiBalance = celiInitialAmount;
@@ -1096,9 +1627,10 @@ function calculate(focusResults) {
 
     var rrqActive  = age >= rrqAge;
     var psvActive  = age >= psvAge;
+    var employerAnnual = getEmployerAnnualForAge(age);
     var rrqAnnual = rrqActive ? rrqAnnualAtStart * Math.pow(1 + rrqIndexRate, age - rrqAge) : 0;
     var psvAnnual = psvActive ? psvAnnualAtStart * Math.pow(1 + psvIndexRate, age - psvAge) : 0;
-    var govAnnual  = rrqAnnual + psvAnnual;
+    var govAnnual  = rrqAnnual + psvAnnual + employerAnnual;
 
     // Monthly compounding
     for (var m = 0; m < 12; m++) {
@@ -1204,6 +1736,7 @@ function calculate(focusResults) {
       totalWithdrawn: totalWithdrawn,
       isRetired:   isRetired,
       govAnnual:   govAnnual,
+      employerAnnual: employerAnnual,
       rrqActive:   rrqActive,
       psvActive:   psvActive,
       celiBalance: celiBalance,
@@ -1239,6 +1772,18 @@ function calculate(focusResults) {
       resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
+
+  var activeTab = getActiveSimulationTab();
+  if (activeTab) {
+    var currentState = collectCurrentFormState();
+    activeTab.formState = cloneFormState(currentState);
+    activeTab.resultFormState = cloneFormState(currentState);
+    activeTab.hasResults = true;
+    activeTab.showAll = showAll;
+    renderSimulationTabs();
+  }
+
+  return true;
 }
 
 function renderResults(retirementAge, endAge, totalContribBase, bankruptAge, psvAge, psvAnnual, rrqAge, rrqAnnual) {
@@ -1402,14 +1947,22 @@ function renderChart(retirementAge, psvAge, rrqAge) {
         tooltip.style.display = 'block';
         tooltip.style.left = Math.min(e.clientX + 14, window.innerWidth - 230) + 'px';
         tooltip.style.top  = (e.clientY - 10) + 'px';
-        var phaseLabel = d.isRetired ? 'RETRAITE' : 'ACCUMULATION';
+        var phaseLabel = d.isRetired ? 'RETRAITE' : 'PRÉ-RETRAITE';
         var mainLabel = d.isRetired ? 'Retrait disponible' : 'Cotisation annuelle';
         var mainValue = d.isRetired
           ? '<span style="color:var(--accent3)">-' + fmtFull(d.yearIncomeAvailable || 0) + '</span>'
           : '<span style="color:var(--blue)">+' + fmtFull(d.yearContrib) + '</span>';
-        var govRow = (d.isRetired && d.govAnnual > 0)
-          ? '<div class="tt-item full"><span class="tt-key">Revenu gouv./an</span><span class="tt-value" style="color:var(--purple)">+' + fmtFull(d.govAnnual) + '</span></div>'
-          : '';
+        var govRow = '';
+        if (d.isRetired && (d.govAnnual > 0 || d.employerAnnual > 0)) {
+          var totalRetraite = (d.govAnnual || 0);
+          var color = 'var(--purple)';
+          // On additionne la pension employeur
+          if (d.employerAnnual > 0) {
+            totalRetraite += d.employerAnnual;
+            color = 'var(--accent2)'; // Accent2 si employeur présent
+          }
+          govRow = '<div class="tt-item full"><span class="tt-key">Revenu retraite/an</span><span class="tt-value" style="color:' + color + '">+' + fmtFull(totalRetraite) + '</span></div>';
+        }
         tooltip.innerHTML =
           '<div class="tt-head"><div class="tt-age">' + (d.isRetired ? '🌴' : '📈') + ' ' + d.age + ' ans</div><div class="tt-phase">' + phaseLabel + '</div></div>' +
           '<div class="tt-main"><span class="tt-key">Capital total</span><span class="tt-value" style="color:var(--accent)">' + fmtFull(d.endCapital) + '</span></div>' +
@@ -1570,6 +2123,8 @@ function animateTableVisibilityChange(nextShowAll) {
   var startHeight = tableLayout.getBoundingClientRect().height;
 
   showAll = nextShowAll;
+  var activeTab = getActiveSimulationTab();
+  if (activeTab) activeTab.showAll = showAll;
   var toggleBtn = document.getElementById('toggleBtn');
   if (toggleBtn) toggleBtn.textContent = showAll ? 'Réduire' : 'Voir tout';
   renderTable();
@@ -1602,8 +2157,8 @@ initNumericInputFormatting();
 updateRrq();
 updatePsv();
 initLimitControls();
+initSimulationTabs();
 initAssistant();
-calculate();
 
 // Initialize theme on page load
 initTheme();

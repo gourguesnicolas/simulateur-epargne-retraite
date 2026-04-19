@@ -23,22 +23,24 @@
     </div>
   </header>
 
+  <div class="simulation-tabs" id="simulationTabs" aria-label="Onglets de simulation"></div>
+
   <div class="form-card">
 
     <div class="section-title"><span class="section-number">1</span>Profil personnel</div>
     <div class="grid-3" style="margin-bottom:12px">
       <div class="field">
         <label>Âge actuel</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="currentAge" value="25" min="15" max="80"><span class="input-unit">ans</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="currentAge" value="0" min="15" max="80"><span class="input-unit">ans</span></div>
       </div>
       <div class="field">
         <label>Âge de retraite</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="retirementAge" value="60" min="40" max="85"><span class="input-unit">ans</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="retirementAge" value="0" min="40" max="85"><span class="input-unit">ans</span></div>
         <span class="field-hint">Début des retraits sur le capital</span>
       </div>
       <div class="field">
         <label>Espérance de vie</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="endAge" value="90" min="60" max="110"><span class="input-unit">ans</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="endAge" value="0" min="60" max="110"><span class="input-unit">ans</span></div>
       </div>
     </div>
 
@@ -52,11 +54,11 @@
         <div class="grid-2">
           <div class="field">
             <label>Solde initial</label>
-            <div class="input-wrap"><input type="text" inputmode="decimal" id="celiInitialAmount" value="2000" min="0"><span class="input-unit">$</span></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="celiInitialAmount" value="0" min="0"><span class="input-unit">$</span></div>
           </div>
           <div class="field">
             <label>Cotisation annuelle souhaitée</label>
-            <div class="input-wrap"><input type="text" inputmode="decimal" id="celiAnnualContrib" value="3000" min="0"><span class="input-unit">$/an</span></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="celiAnnualContrib" value="0" min="0"><span class="input-unit">$/an</span></div>
           </div>
           <div class="field-separator">
             <span>Limites de cotisation</span>
@@ -68,11 +70,11 @@
           <div class="limit-fields" id="celiLimitFields">
             <div class="field">
               <label>Droits CELI disponibles</label>
-              <div class="input-wrap"><input type="text" inputmode="decimal" id="celiRoomAvailable" value="10000" min="0"><span class="input-unit">$</span></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="celiRoomAvailable" value="0" min="0"><span class="input-unit">$</span></div>
             </div>
             <div class="field">
               <label>Limite annuelle CELI</label>
-              <div class="input-wrap"><input type="text" inputmode="decimal" id="celiAnnualLimit" value="7000" min="0"><span class="input-unit">$/an</span></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="celiAnnualLimit" value="0" min="0"><span class="input-unit">$/an</span></div>
             </div>
           </div>
         </div>
@@ -82,11 +84,11 @@
         <div class="grid-2">
           <div class="field">
             <label>Solde initial</label>
-            <div class="input-wrap"><input type="text" inputmode="decimal" id="reerInitialAmount" value="2000" min="0"><span class="input-unit">$</span></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="reerInitialAmount" value="0" min="0"><span class="input-unit">$</span></div>
           </div>
           <div class="field">
             <label>Cotisation annuelle souhaitée</label>
-            <div class="input-wrap"><input type="text" inputmode="decimal" id="reerAnnualContrib" value="2000" min="0"><span class="input-unit">$/an</span></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="reerAnnualContrib" value="0" min="0"><span class="input-unit">$/an</span></div>
           </div>
           <div class="field-separator">
             <span>Limites de cotisation</span>
@@ -98,19 +100,19 @@
           <div class="limit-fields" id="reerLimitFields">
             <div class="field">
               <label>Revenu annuel brut</label>
-              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerIncome" value="70000" min="0"><span class="input-unit">$/an</span></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerIncome" value="0" min="0"><span class="input-unit">$/an</span></div>
             </div>
             <div class="field">
               <label>Droits REER disponibles</label>
-              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerRoomAvailable" value="15000" min="0"><span class="input-unit">$</span></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerRoomAvailable" value="0" min="0"><span class="input-unit">$</span></div>
             </div>
             <div class="field">
               <label>Taux de droit REER</label>
-              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerRoomRate" value="18" min="0" max="100" step="0.1"><span class="input-unit">%</span></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerRoomRate" value="0" min="0" max="100" step="0.1"><span class="input-unit">%</span></div>
             </div>
             <div class="field">
               <label>Plafond annuel REER</label>
-              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerAnnualCap" value="33000" min="0"><span class="input-unit">$/an</span></div>
+              <div class="input-wrap"><input type="text" inputmode="decimal" id="reerAnnualCap" value="0" min="0"><span class="input-unit">$/an</span></div>
             </div>
           </div>
         </div>
@@ -120,57 +122,126 @@
         <div class="grid-2">
           <div class="field">
             <label>Solde initial</label>
-            <div class="input-wrap"><input type="text" inputmode="decimal" id="nonRegInitialAmount" value="1000" min="0"><span class="input-unit">$</span></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="nonRegInitialAmount" value="0" min="0"><span class="input-unit">$</span></div>
           </div>
           <div class="field">
             <label>Cotisation annuelle souhaitée</label>
-            <div class="input-wrap"><input type="text" inputmode="decimal" id="nonRegAnnualContrib" value="1000" min="0"><span class="input-unit">$/an</span></div>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="nonRegAnnualContrib" value="0" min="0"><span class="input-unit">$/an</span></div>
           </div>
           <div class="field-separator muted" aria-hidden="true"><span>Limites de cotisation non applicables</span></div>
         </div>
       </div>
     </div>
 
-    <div class="info-box blue">
-      Les limites CELI/REER peuvent etre actives (Oui) ou desactivees (Non). En mode Oui, les cotisations sont plafonnees automatiquement et les depassements sont signales dans la section problemes.
+    <div class="info-box blue info-box-employer-gap">
+      Les limites CELI/REER peuvent être activées (<strong>Oui</strong>) ou désactivées (<strong>Non</strong>). En mode <strong>Oui</strong>, les cotisations sont plafonnées automatiquement et les dépassements sont signalés dans la section problèmes.
     </div>
 
     <div class="grid-2" style="margin-bottom:20px">
       <div class="field">
         <label>Augmentation annuelle des cotisations</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="contribGrowth" value="2" min="0" max="20" step="0.1"><span class="input-unit">%/an</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="contribGrowth" value="0" min="0" max="20" step="0.1"><span class="input-unit">%/an</span></div>
         <span class="field-hint">Ex: hausses de salaire</span>
       </div>
       <div class="field">
         <label>Rendement annuel (pré-retraite)</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="growthRate" value="3.5" min="0" max="30" step="0.1"><span class="input-unit">%/an</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="growthRate" value="0" min="0" max="30" step="0.1"><span class="input-unit">%/an</span></div>
       </div>
     </div>
 
     <div class="divider"></div>
 
-    <div class="section-title"><span class="section-number">3</span>Phase de retraite</div>
+    <div class="section-title"><span class="section-number">3</span>Régime de l'employeur</div>
+    <div class="employer-pension-grid" style="margin-bottom:12px">
+      <section class="employer-pension-card">
+        <div class="account-panel-head employer-card-head">
+          <div class="employer-card-title-group">
+            <span class="account-badge">A</span>
+            <span class="account-panel-title">Employeur #1</span>
+          </div>
+          <div class="limit-toggle" role="radiogroup" aria-label="Activer la section pension 1">
+            <label><input type="radio" name="employerPension1Mode" value="yes"><span>AVEC</span></label>
+            <label><input type="radio" name="employerPension1Mode" value="no" checked><span>SANS</span></label>
+          </div>
+        </div>
+        <div class="employer-pension-fields limit-fields is-hidden" id="employerPension1Fields">
+          <div class="field">
+            <label>Montant</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="employerPension1Amount" value="0" min="0" aria-label="Montant pension 1"><span class="input-unit">$/an</span></div>
+          </div>
+          <div class="field">
+            <label>Indexé à</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="employerPension1IndexRate" value="0" min="0" max="100" step="0.1" aria-label="Indexation pension 1"><span class="input-unit">%/an</span></div>
+          </div>
+          <div class="field">
+            <label>Âge de début</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="employerPension1StartAge" value="0" min="0" max="120" aria-label="Âge de départ pension 1"><span class="input-unit">ans</span></div>
+          </div>
+          <div class="field">
+            <label>Âge de fin</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="employerPension1EndAge" value="0" min="0" max="120" aria-label="Âge de fin pension 1"><span class="input-unit">ans</span></div>
+          </div>
+        </div>
+      </section>
+      <section class="employer-pension-card is-alt">
+        <div class="account-panel-head employer-card-head">
+          <div class="employer-card-title-group">
+            <span class="account-badge">B</span>
+            <span class="account-panel-title">Employeur #2</span>
+          </div>
+          <div class="limit-toggle" role="radiogroup" aria-label="Activer la section pension 2">
+            <label><input type="radio" name="employerPension2Mode" value="yes"><span>AVEC</span></label>
+            <label><input type="radio" name="employerPension2Mode" value="no" checked><span>SANS</span></label>
+          </div>
+        </div>
+        <div class="employer-pension-fields limit-fields is-hidden" id="employerPension2Fields">
+          <div class="field">
+            <label>Montant</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="employerPension2Amount" value="0" min="0" aria-label="Montant pension 2"><span class="input-unit">$/an</span></div>
+          </div>
+          <div class="field">
+            <label>Indexé à</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="employerPension2IndexRate" value="0" min="0" max="100" step="0.1" aria-label="Indexation pension 2"><span class="input-unit">%/an</span></div>
+          </div>
+          <div class="field">
+            <label>Âge de début</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="employerPension2StartAge" value="0" min="0" max="120" aria-label="Âge de départ pension 2"><span class="input-unit">ans</span></div>
+          </div>
+          <div class="field">
+            <label>Âge de fin</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="employerPension2EndAge" value="0" min="0" max="120" aria-label="Âge de fin pension 2"><span class="input-unit">ans</span></div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="info-box blue" style="margin-bottom:20px">
+      Vous pouvez choisir d'utiliser (<strong>Avec</strong>) ou de ne pas utiliser (<strong>Sans</strong>) les sections destinées à calculer les montants d'un régime de retraite chez un employeur. Laissez l'âge de fin à 0 pour une rente versée sans échéance fixe.
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-title"><span class="section-number">4</span>Phase de retraite</div>
     <div class="grid-3" style="margin-bottom:20px">
       <div class="field">
         <label>Retrait annuel</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="annualWithdrawal" value="36000" min="0"><span class="input-unit">$/an</span></div>
-        <span class="field-hint">Ex: 3 000$/mois = 36 000$/an</span>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="annualWithdrawal" value="0" min="0"><span class="input-unit">$/an</span></div>
+        <span class="field-hint">Ex: 3 250$/mois = 39 000$/an</span>
       </div>
       <div class="field">
         <label>Rendement annuel (retraite)</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="retirGrowthRate" value="2.5" min="0" max="30" step="0.1"><span class="input-unit">%/an</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="retirGrowthRate" value="0" min="0" max="30" step="0.1"><span class="input-unit">%/an</span></div>
         <span class="field-hint">Souvent plus conservateur</span>
       </div>
       <div class="field">
         <label>Inflation anticipée</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="inflation" value="2" min="0" max="15" step="0.1"><span class="input-unit">%/an</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="inflation" value="0" min="0" max="15" step="0.1"><span class="input-unit">%/an</span></div>
         <span class="field-hint">Indexe le retrait annuellement</span>
       </div>
     </div>
 
     <div class="divider"></div>
 
-    <div class="section-title"><span class="section-number">4</span>Rente RRQ / RPC</div>
+    <div class="section-title"><span class="section-number">5</span>Rente RRQ / RPC</div>
     <div class="grid-2" style="margin-bottom:12px">
       <div class="field">
         <label>Rente de base</label>
@@ -179,19 +250,19 @@
       </div>
       <div class="field">
         <label>Âge de début</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="rrqAge" value="65" min="60" max="72" oninput="updateRrq()"><span class="input-unit">ans</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="rrqAge" value="0" min="60" max="72" oninput="updateRrq()"><span class="input-unit">ans</span></div>
         <span class="field-hint">60-64: -7,2%/an &nbsp; 66-72: +8,4%/an (plafonné à 72)</span>
       </div>
       <div class="field">
         <label>Taux d'indexation annuel RRQ</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="rrqIndexRate" value="2.0" min="0" max="15" step="0.1" oninput="updateRrq()"><span class="input-unit">%/an</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="rrqIndexRate" value="0" min="0" max="15" step="0.1" oninput="updateRrq()"><span class="input-unit">%/an</span></div>
         <span class="field-hint">2026: 2,0% (Retraite Québec)</span>
       </div>
       <div class="field">
         <label>Rente RRQ</label>
         <div class="calc-display">
           <span id="rrqPct" style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted)">+-0%</span>
-          <span id="rrqFinal" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--blue)">= 0 $/an</span>
+          <span id="rrqFinal" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--blue)">= 10 125 $/an</span>
         </div>
         <span class="field-hint">Calcul automatique</span>
       </div>
@@ -202,26 +273,26 @@
 
     <div class="divider"></div>
 
-    <div class="section-title"><span class="section-number">5</span>Pension de Sécurité de la Vieillesse (PSV)</div>
+    <div class="section-title"><span class="section-number">6</span>Pension de Sécurité de la Vieillesse (PSV)</div>
     <div class="grid-2" style="margin-bottom:12px">
       <div class="field">
         <label>Montant de la PSV (À 65 ans)</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvBase" value="8917" min="0" oninput="updatePsv()"><span class="input-unit">$/an</span></div>
-        <span class="field-hint">2026 ≈ 8 917$/an</span>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvBase" value="0" min="0" oninput="updatePsv()"><span class="input-unit">$/an</span></div>
+        <span class="field-hint">2026 ≈ 9 000$/an</span>
       </div>
       <div class="field">
         <label>Années au Canada (après 18 ans)</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvYears" value="40" min="1" max="40" oninput="updatePsv()"><span class="input-unit">ans</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvYears" value="0" min="1" max="40" oninput="updatePsv()"><span class="input-unit">ans</span></div>
         <span class="field-hint">Max 40 -- proratisé si moins de 40</span>
       </div>
       <div class="field">
         <label>Âge de début (de la PSV)</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvAge" value="65" min="65" max="70" oninput="updatePsv()"><span class="input-unit">ans</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvAge" value="0" min="65" max="70" oninput="updatePsv()"><span class="input-unit">ans</span></div>
         <span class="field-hint">65-70: +7,2%/an de report</span>
       </div>
       <div class="field">
         <label>Taux d'indexation annuel PSV</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvIndexRate" value="2.1" min="0" max="15" step="0.1" oninput="updatePsv()"><span class="input-unit">%/an</span></div>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="psvIndexRate" value="0" min="0" max="15" step="0.1" oninput="updatePsv()"><span class="input-unit">%/an</span></div>
         <span class="field-hint">2026: +2,1% sur 12 mois (Canada.ca)</span>
       </div>
     </div>
@@ -262,6 +333,9 @@
               <span class="account-summary-metric-label">Intérêts générés</span>
               <span class="account-summary-metric-value" id="sInterest">--</span>
             </div>
+          </div>
+          <div class="account-summary-note-explain" style="margin-top:18px;color:var(--muted);font-size:13px;max-width:600px">
+            <strong>Note :</strong> Ces montants n'incluent pas les revenus des régimes de retraite des employeurs, ni ceux du RRQ ou de la PSV.
           </div>
         </div>
       </div>
@@ -330,7 +404,7 @@
                 <th>Capital début</th>
                 <th>Cotisation</th>
                 <th>Retrait capital</th>
-                <th>Revenu gouv.</th>
+                <th>Revenu retraite</th>
                 <th>Rendement</th>
                 <th>Capital fin</th>
               </tr>
