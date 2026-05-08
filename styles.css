@@ -199,6 +199,16 @@
   --grid-line-opacity: 0.046;
 }
 
+:root.light-mode input[type="number"],
+:root.light-mode input[type="text"] {
+  background: #ffffff !important;
+}
+
+:root.dark-mode input[type="number"],
+:root.dark-mode input[type="text"] {
+  background: #000000 !important;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
