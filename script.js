@@ -1,74 +1,3 @@
-// --- Système de traduction multilingue ---
-let currentLanguage = localStorage.getItem('language') || 'fr';
-let translations = {};
-
-async function loadTranslations() {
-  try {
-    const response = await fetch('translations.json');
-    translations = await response.json();
-    applyLanguage(currentLanguage);
-    setupLanguageToggle();
-    // Réappliquer le thème avec les traductions maintenant disponibles
-    const savedTheme = localStorage.getItem('theme') || 'dark-mode';
-    applyTheme(savedTheme);
-  } catch (error) {
-    console.error('Erreur lors du chargement des traductions:', error);
-  }
-}
-
-function applyLanguage(lang) {
-  currentLanguage = lang;
-  localStorage.setItem('language', lang);
-  
-  // Mettre à jour l'attribut lang du document
-  document.documentElement.lang = lang;
-  
-  // Mettre à jour tous les éléments avec data-i18n
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (translations[lang] && translations[lang][key]) {
-      // Ne pas remplacer le contenu si c'est une balise imbriquée
-      if (el.children.length === 0) {
-        el.textContent = translations[lang][key];
-      } else {
-        // Pour les éléments avec des enfants, chercher le texte direct
-        el.childNodes.forEach(node => {
-          if (node.nodeType === Node.TEXT_NODE) {
-            node.textContent = translations[lang][key];
-          }
-        });
-      }
-    }
-  });
-  
-  // Mettre à jour le label du thème toggle
-  const themeLabelKey = document.documentElement.classList.contains('light-mode') ? 'light' : 'dark';
-  const themeLabel = document.getElementById('themeLabel');
-  if (themeLabel && translations[lang] && translations[lang][themeLabelKey]) {
-    themeLabel.textContent = translations[lang][themeLabelKey];
-  }
-  
-  // Mettre à jour les boutons de langue active
-  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.getAttribute('data-lang') === lang) {
-      btn.classList.add('active');
-    }
-  });
-}
-
-function setupLanguageToggle() {
-  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const lang = btn.getAttribute('data-lang');
-      applyLanguage(lang);
-    });
-  });
-}
-
-window.addEventListener('DOMContentLoaded', loadTranslations);
-
 // --- Effacement et effet pale sur focus input (tous les champs numériques) ---
 function setupInputFocusBehavior() {
   const inputSelectors = [
@@ -1378,12 +1307,10 @@ function applyTheme(theme) {
   
   if (theme === 'light-mode') {
     toggle.classList.add('active');
-    const labelKey = 'light';
-    label.textContent = translations[currentLanguage] ? translations[currentLanguage][labelKey] : 'Clair';
+    label.textContent = 'Clair';
   } else {
     toggle.classList.remove('active');
-    const labelKey = 'dark';
-    label.textContent = translations[currentLanguage] ? translations[currentLanguage][labelKey] : 'Sombre';
+    label.textContent = 'Sombre';
   }
   
   localStorage.setItem('theme', theme);
@@ -2233,6 +2160,6 @@ initLimitControls();
 initSimulationTabs();
 initAssistant();
 
-// Initialize theme toggle event listener
-// Theme will be initialized after translations are loaded
+// Initialize theme on page load
+initTheme();
 document.getElementById('themeToggle').addEventListener('click', toggleTheme);

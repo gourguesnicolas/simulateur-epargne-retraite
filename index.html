@@ -13,19 +13,13 @@
   <div class="app-main">
   <header>
     <div class="header-content">
-      <div class="header-label" data-i18n="simulator_financial">simulateur financier</div>
-      <h1><span data-i18n="savings_retirement">Épargne</span> <em>Retraite</em></h1>
-      <p class="subtitle" data-i18n="growth_subtitle">Vos placements continuent de croître même après le début des retraits.</p>
+      <div class="header-label">simulateur financier</div>
+      <h1>Épargne <em>Retraite</em></h1>
+      <p class="subtitle">Vos placements continuent de croître même après le début des retraits.</p>
     </div>
-    <div class="header-controls">
-      <div class="lang-toggle" id="langToggle">
-        <button class="lang-toggle-btn lang-fr active" data-lang="fr">FR</button>
-        <button class="lang-toggle-btn lang-en" data-lang="en">EN</button>
-      </div>
-      <div class="theme-toggle" id="themeToggle">
-        <span class="theme-toggle-label" id="themeLabel" data-i18n="dark">Sombre</span>
-        <div class="theme-toggle-switch"></div>
-      </div>
+    <div class="theme-toggle" id="themeToggle">
+      <span class="theme-toggle-label" id="themeLabel">Sombre</span>
+      <div class="theme-toggle-switch"></div>
     </div>
   </header>
 
@@ -33,27 +27,27 @@
 
   <div class="form-card">
 
-    <div class="section-title" data-i18n="profile_personal"><span class="section-number">1</span>Profil personnel</div>
+    <div class="section-title"><span class="section-number">1</span>Profil personnel</div>
     <div class="grid-3" style="margin-bottom:12px">
       <div class="field">
-        <label data-i18n="current_age">Âge actuel</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="currentAge" value="0" min="15" max="80"><span class="input-unit" data-i18n="years">ans</span></div>
+        <label>Âge actuel</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="currentAge" value="0" min="15" max="80"><span class="input-unit">ans</span></div>
       </div>
       <div class="field">
-        <label data-i18n="retirement_age">Âge de retraite</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="retirementAge" value="0" min="40" max="85"><span class="input-unit" data-i18n="years">ans</span></div>
-        <span class="field-hint" data-i18n="retirement_begin">Début des retraits sur le capital</span>
+        <label>Âge de retraite</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="retirementAge" value="0" min="40" max="85"><span class="input-unit">ans</span></div>
+        <span class="field-hint">Début des retraits sur le capital</span>
       </div>
       <div class="field">
-        <label data-i18n="life_expectancy">Espérance de vie</label>
-        <div class="input-wrap"><input type="text" inputmode="decimal" id="endAge" value="0" min="60" max="110"><span class="input-unit" data-i18n="years">ans</span></div>
+        <label>Espérance de vie</label>
+        <div class="input-wrap"><input type="text" inputmode="decimal" id="endAge" value="0" min="60" max="110"><span class="input-unit">ans</span></div>
       </div>
     </div>
 
     <div class="divider"></div>
 
 
-    <div class="section-title" data-i18n="savings_contributions"><span class="section-number">2</span>Épargne &amp; cotisations</div>
+    <div class="section-title"><span class="section-number">2</span>Épargne &amp; cotisations</div>
     <div class="account-grid" style="margin-bottom:20px">
       <div class="account-panel">
         <div class="account-panel-head"><span class="account-badge">A</span><span class="account-panel-title">CELI</span></div>
@@ -63,23 +57,23 @@
             <div class="input-wrap"><input type="text" inputmode="decimal" id="celiInitialAmount" value="0" min="0"><span class="input-unit">$</span></div>
           </div>
           <div class="field">
-            <label data-i18n="annual_contribution">Cotisation annuelle souhaitée</label>
-            <div class="input-wrap"><input type="text" inputmode="decimal" id="celiAnnualContrib" value="0" min="0"><span class="input-unit" data-i18n="per_year">$/an</span></div>
+            <label>Cotisation annuelle souhaitée</label>
+            <div class="input-wrap"><input type="text" inputmode="decimal" id="celiAnnualContrib" value="0" min="0"><span class="input-unit">$/an</span></div>
           </div>
           <div class="field-separator">
             <span>Limites de cotisation</span>
             <div class="limit-toggle" role="radiogroup" aria-label="Appliquer les limites CELI">
-              <label><input type="radio" name="celiLimitMode" value="yes"><span data-i18n="yes">Oui</span></label>
-              <label><input type="radio" name="celiLimitMode" value="no" checked><span data-i18n="no">Non</span></label>
+              <label><input type="radio" name="celiLimitMode" value="yes"><span>Oui</span></label>
+              <label><input type="radio" name="celiLimitMode" value="no" checked><span>Non</span></label>
             </div>
           </div>
           <div class="limit-fields" id="celiLimitFields">
             <div class="field">
-              <label data-i18n="celi_available_rights">Droits CELI disponibles</label>
+              <label>Droits CELI disponibles</label>
               <div class="input-wrap"><input type="text" inputmode="decimal" id="celiRoomAvailable" value="0" min="0"><span class="input-unit">$</span></div>
             </div>
             <div class="field">
-              <label data-i18n="celi_annual_limit">Limite annuelle CELI</label>
+              <label>Limite annuelle CELI</label>
               <div class="input-wrap"><input type="text" inputmode="decimal" id="celiAnnualLimit" value="0" min="0"><span class="input-unit">$/an</span></div>
             </div>
           </div>
