@@ -1707,8 +1707,8 @@ function calculate(focusResults, options) {
           totalBalance: celiBalance + reerBalance + nonRegBalance,
           celiRoom: celiLimitsEnabled ? celiRoom : null,
           reerRoom: reerLimitsEnabled ? reerRoom : null,
-          totalContrib: totalContrib,
-          totalInterest: totalInterest
+          totalContrib: totalContrib + yContrib,
+          totalInterest: totalInterest + yInterest
         };
       }
     } else {
