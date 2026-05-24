@@ -1787,6 +1787,7 @@ function calculate(focusResults, options) {
 }
 
 function renderResults(retirementAge, endAge, totalContribBase, bankruptAge, psvAge, psvAnnual, rrqAge, rrqAnnual) {
+  showPdfButton();
   var retData   = null;
   for (var i = 0; i < allData.length; i++) { if (allData[i].age === retirementAge) { retData = allData[i]; break; } }
   var finalData = allData[allData.length - 1];
@@ -2151,6 +2152,214 @@ function animateTableVisibilityChange(nextShowAll) {
 
 function toggleTable() {
   animateTableVisibilityChange(!showAll);
+}
+
+function formatNumberFR(num) {
+  if (num === null || num === undefined) return '0 $';
+  return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' $';
+}
+
+function extractKeyYears() {
+  if (allData.length === 0) return [];
+  var keyYears = [];
+  var retirementAge = Math.round(getNumericValue('retirementAge', 0));
+  var endAge = Math.round(getNumericValue('endAge', 0));
+
+  var keyAges = new Set([allData[0].age]);
+
+  if (retirementAge > 0) {
+    for (var i = 0; i < allData.length; i++) {
+      if (allData[i].age === retirementAge) {
+        keyAges.add(retirementAge);
+        break;
+      }
+    }
+  }
+
+  for (var i = 0; i < allData.length; i++) {
+    var age = allData[i].age;
+    if (age >= retirementAge && age % 5 === 0) {
+      keyAges.add(age);
+    }
+  }
+
+  if (allData.length > 0) {
+    keyAges.add(allData[allData.length - 1].age);
+  }
+
+  var sortedAges = Array.from(keyAges).sort(function(a, b) { return a - b; });
+
+  for (var i = 0; i < sortedAges.length; i++) {
+    var age = sortedAges[i];
+    for (var j = 0; j < allData.length; j++) {
+      if (allData[j].age === age) {
+        keyYears.push(allData[j]);
+        break;
+      }
+    }
+  }
+
+  return keyYears;
+}
+
+async function exportSimulationToPDF() {
+  if (allData.length === 0) {
+    alert('Veuillez d\'abord simuler votre retraite.');
+    return;
+  }
+
+  try {
+    var formState = collectCurrentFormState();
+    var keyYears = extractKeyYears();
+    var now = new Date();
+    var dateStr = now.toLocaleDateString('fr-CA');
+    var timeStr = now.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' });
+
+    var htmlContent = '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Simulation Retraite</title>';
+    htmlContent += '<style>';
+    htmlContent += 'body { font-family: Arial, sans-serif; margin: 20px; color: #333; }';
+    htmlContent += 'h1 { font-size: 24px; margin-bottom: 5px; color: #2980b9; font-weight: bold; }';
+    htmlContent += '.date { font-size: 12px; color: #666; margin-bottom: 20px; }';
+    htmlContent += '.section-title { font-size: 14px; font-weight: bold; margin-top: 20px; margin-bottom: 10px; color: #2980b9; border-bottom: 3px solid #2980b9; padding-bottom: 5px; }';
+    htmlContent += 'table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }';
+    htmlContent += 'thead tr { background-color: #2980b9 !important; }';
+    htmlContent += 'th { background-color: #2980b9 !important; color: white !important; padding: 10px 8px; text-align: left; font-size: 11px; font-weight: bold; border: 1px solid #2980b9; }';
+    htmlContent += 'td { padding: 7px 8px; border-bottom: 1px solid #ddd; font-size: 10px; }';
+    htmlContent += 'tr:nth-child(even) { background-color: #f8f9fa; }';
+    htmlContent += '.param-label { font-weight: bold; color: #2980b9; }';
+    htmlContent += '.param-value { text-align: right; font-weight: 500; }';
+    htmlContent += '@media print { * { background-color: transparent !important; color: inherit; } thead tr { background-color: #2980b9 !important; } th { background-color: #2980b9 !important; color: white !important; } }';
+    htmlContent += '</style></head><body>';
+
+    htmlContent += '<h1>Simulation Retraite</h1>';
+    htmlContent += '<div class="date">Rapport généré le ' + dateStr + ' à ' + timeStr + '</div>';
+
+    htmlContent += '<div class="section-title">Paramètres de la simulation</div>';
+    htmlContent += '<table><tr>';
+
+    var params = [
+      { label: 'Âge actuel', value: formState.currentAge },
+      { label: 'Âge de retraite', value: formState.retirementAge },
+      { label: 'Espérance de vie', value: formState.endAge },
+      { label: 'CELI - Solde', value: formatNumberFR(formState.celiInitialAmount) },
+      { label: 'CELI - Cotisation/an', value: formatNumberFR(formState.celiAnnualContrib) },
+      { label: 'REER - Solde', value: formatNumberFR(formState.reerInitialAmount) },
+      { label: 'REER - Cotisation/an', value: formatNumberFR(formState.reerAnnualContrib) },
+      { label: 'Non-enregistré - Solde', value: formatNumberFR(formState.nonRegInitialAmount) },
+      { label: 'Non-enregistré - Cotisation/an', value: formatNumberFR(formState.nonRegAnnualContrib) },
+      { label: 'Rendement pré-retraite', value: formState.growthRate.toFixed(2) + ' %' },
+      { label: 'Rendement retraite', value: formState.retirGrowthRate.toFixed(2) + ' %' },
+      { label: 'Retrait annuel', value: formatNumberFR(formState.annualWithdrawal) },
+      { label: 'Inflation', value: formState.inflation.toFixed(2) + ' %' }
+    ];
+
+    for (var i = 0; i < params.length; i++) {
+      if (i > 0 && i % 3 === 0) {
+        htmlContent += '</tr><tr>';
+      }
+      htmlContent += '<td><span class="param-label">' + params[i].label + ':</span> <span class="param-value">' + params[i].value + '</span></td>';
+    }
+    htmlContent += '</tr></table>';
+
+    htmlContent += '<div class="section-title">Évolution annuelle du capital</div>';
+    htmlContent += '<table>';
+    htmlContent += '<thead><tr><th style="color: #2980b9 !important; background: transparent !important; border-bottom: 2px solid #2980b9; padding: 7px 8px; font-size: 10px; font-weight: bold;">Âge</th><th style="color: #2980b9 !important; background: transparent !important; border-bottom: 2px solid #2980b9; padding: 7px 8px; font-size: 10px; font-weight: bold;">Capital début</th><th style="color: #2980b9 !important; background: transparent !important; border-bottom: 2px solid #2980b9; padding: 7px 8px; font-size: 10px; font-weight: bold;">Cotisation</th><th style="color: #2980b9 !important; background: transparent !important; border-bottom: 2px solid #2980b9; padding: 7px 8px; font-size: 10px; font-weight: bold;">Retrait</th><th style="color: #2980b9 !important; background: transparent !important; border-bottom: 2px solid #2980b9; padding: 7px 8px; font-size: 10px; font-weight: bold;">Rendement</th><th style="color: #2980b9 !important; background: transparent !important; border-bottom: 2px solid #2980b9; padding: 7px 8px; font-size: 10px; font-weight: bold;">Capital fin</th></tr></thead>';
+    htmlContent += '<tbody>';
+
+    for (var i = 0; i < keyYears.length; i++) {
+      var d = keyYears[i];
+      htmlContent += '<tr>';
+      htmlContent += '<td><strong>' + d.age + '</strong></td>';
+      htmlContent += '<td>' + formatNumberFR(d.startCapital) + '</td>';
+      htmlContent += '<td>' + formatNumberFR(d.yearContrib) + '</td>';
+      htmlContent += '<td>' + formatNumberFR(d.yearWithdrawn) + '</td>';
+      htmlContent += '<td>' + formatNumberFR(d.yearInterest) + '</td>';
+      htmlContent += '<td><strong>' + formatNumberFR(d.endCapital) + '</strong></td>';
+      htmlContent += '</tr>';
+    }
+
+    htmlContent += '</tbody></table>';
+
+    htmlContent += '<div class="section-title">Graphique - Évolution du capital</div>';
+
+    var retirementAge = Math.round(getNumericValue('retirementAge', 0));
+    var maxCapital = 0;
+    for (var i = 0; i < allData.length; i++) {
+      if (allData[i].endCapital > maxCapital) maxCapital = allData[i].endCapital;
+    }
+
+    var graphHeight = 280;
+    var graphWidth = Math.max(700, allData.length * 7);
+    var barWidth = graphWidth / allData.length;
+    var svgContent = '<svg width="100%" height="350" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (graphWidth + 120) + ' 350" preserveAspectRatio="xMidYMid meet" style="page-break-inside: avoid;">';
+
+    svgContent += '<g transform="translate(70, 10)">';
+
+    for (var tick = 0; tick <= 4; tick++) {
+      var tickY = graphHeight - (graphHeight / 4) * tick;
+      var tickValue = Math.round((maxCapital / 4) * tick);
+      var tickLabel;
+      if (tickValue >= 1000000000) {
+        tickLabel = (tickValue / 1000000000).toFixed(1) + 'G$';
+      } else if (tickValue >= 1000000) {
+        tickLabel = (tickValue / 1000000).toFixed(1) + 'M$';
+      } else if (tickValue >= 1000) {
+        tickLabel = (tickValue / 1000).toFixed(0) + 'k$';
+      } else {
+        tickLabel = tickValue + '$';
+      }
+
+      svgContent += '<line x1="0" y1="' + tickY + '" x2="' + graphWidth + '" y2="' + tickY + '" stroke="#e0e0e0" stroke-width="0.5"/>';
+      svgContent += '<text x="-8" y="' + (tickY + 3) + '" text-anchor="end" font-size="9" fill="#666">' + tickLabel + '</text>';
+    }
+
+    svgContent += '<line x1="0" y1="' + graphHeight + '" x2="' + graphWidth + '" y2="' + graphHeight + '" stroke="#999" stroke-width="1"/>';
+    svgContent += '<line x1="0" y1="0" x2="0" y2="' + graphHeight + '" stroke="#999" stroke-width="1"/>';
+
+    for (var i = 0; i < allData.length; i++) {
+      var d = allData[i];
+      var barHeight = (d.endCapital / maxCapital) * graphHeight;
+      var barColor = d.age < retirementAge ? '#4a90e2' : '#2980b9';
+      var xPos = i * barWidth;
+      var yPos = graphHeight - barHeight;
+
+      svgContent += '<rect x="' + xPos + '" y="' + yPos + '" width="' + (barWidth - 2) + '" height="' + barHeight + '" fill="' + barColor + '" stroke="' + barColor + '" stroke-width="0.5"/>';
+
+      if (allData.length <= 30 || d.age % 5 === 0 || i === 0 || i === allData.length - 1) {
+        svgContent += '<text x="' + (xPos + barWidth / 2) + '" y="' + (graphHeight + 20) + '" text-anchor="middle" font-size="10" fill="#333">' + d.age + '</text>';
+      }
+    }
+
+    svgContent += '<rect x="20" y="' + (graphHeight + 45) + '" width="20" height="20" fill="#4a90e2"/>';
+    svgContent += '<text x="50" y="' + (graphHeight + 60) + '" font-size="12" fill="#333">Avant retraite</text>';
+
+    svgContent += '<rect x="220" y="' + (graphHeight + 45) + '" width="20" height="20" fill="#2980b9"/>';
+    svgContent += '<text x="250" y="' + (graphHeight + 60) + '" font-size="12" fill="#333">Retraite</text>';
+
+    svgContent += '</g></svg>';
+
+    htmlContent += svgContent;
+    htmlContent += '</body></html>';
+
+    var printWindow = window.open('', '_blank');
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+
+    setTimeout(function() {
+      printWindow.print();
+    }, 800);
+
+  } catch (err) {
+    console.error('Erreur lors de la génération du PDF:', err);
+    alert('Erreur: ' + err.message);
+  }
+}
+
+function showPdfButton() {
+  var container = document.getElementById('pdfButtonContainer');
+  if (container) {
+    container.style.display = 'block';
+  }
 }
 
 initNumericInputFormatting();
