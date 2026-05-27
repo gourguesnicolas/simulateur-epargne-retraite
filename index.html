@@ -309,7 +309,12 @@
       Report à 70 ans = +36% (5 x 7,2%). Si vous avez vécu au Canada moins de 40 ans après vos 18 ans, le montant est ajusté à la baisse (ex. : 20 ans = 50% de la pension).
     </div>
 
-    <button class="btn-calc" onclick="calculate(true)">Simuler ma retraite</button>
+    <button class="btn-calc" onclick="calculate(true)">
+      <span>Simuler ma retraite</span>
+      <span class="btn-calc-icon" aria-hidden="true">
+        <img src="https://cdn-icons-png.flaticon.com/512/126/126425.png" alt="" role="presentation" />
+      </span>
+    </button>
   </div>
 
   <div id="results">
@@ -418,7 +423,12 @@
   </div>
 
   <div id="pdfButtonContainer" style="display:none;padding:20px;text-align:center;max-width:calc(960px - 56px);margin:0 auto;width:100%;box-sizing:border-box">
-    <button class="btn-calc" style="width:280px;max-width:100%;box-sizing:border-box" onclick="exportSimulationToPDF()">Enregistrer en PDF</button>
+    <button class="btn-calc" style="width:280px;max-width:100%;box-sizing:border-box" onclick="exportSimulationToPDF()">
+      <span>Enregistrer en PDF</span>
+      <span class="btn-calc-icon" aria-hidden="true">
+        <img src="https://cdn-icons-png.flaticon.com/512/159/159634.png" alt="" role="presentation" />
+      </span>
+    </button>
   </div>
 
   </div>

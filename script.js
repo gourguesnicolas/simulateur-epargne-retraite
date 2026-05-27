@@ -1322,6 +1322,52 @@ function toggleTheme() {
   applyTheme(newTheme);
 }
 
+function updateCalcButtonLayoutState() {
+  var buttons = document.querySelectorAll('.btn-calc');
+  for (var i = 0; i < buttons.length; i++) {
+    var button = buttons[i];
+    var label = null;
+    for (var j = 0; j < button.children.length; j++) {
+      if (!button.children[j].classList.contains('btn-calc-icon')) {
+        label = button.children[j];
+        break;
+      }
+    }
+    if (!label) continue;
+
+    var computedStyle = window.getComputedStyle(label);
+    var lineHeight = parseFloat(computedStyle.lineHeight);
+    if (!lineHeight || isNaN(lineHeight)) {
+      lineHeight = parseFloat(computedStyle.fontSize) * 1.2;
+    }
+
+    var labelHeight = label.getBoundingClientRect().height;
+    var isWrapped = labelHeight > lineHeight * 1.35;
+
+    button.classList.toggle('is-wrapped', isWrapped);
+  }
+}
+
+function initCalcButtonLayoutState() {
+  updateCalcButtonLayoutState();
+
+  window.addEventListener('resize', updateCalcButtonLayoutState);
+
+  if (window.ResizeObserver) {
+    var buttons = document.querySelectorAll('.btn-calc');
+    if (buttons.length) {
+      var observer = new ResizeObserver(updateCalcButtonLayoutState);
+      for (var i = 0; i < buttons.length; i++) {
+        observer.observe(buttons[i]);
+      }
+    }
+  }
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(updateCalcButtonLayoutState);
+  }
+}
+
 function parseLocaleNumber(value) {
   if (value == null) return NaN;
   var normalized = String(value)
@@ -2368,6 +2414,7 @@ updatePsv();
 initLimitControls();
 initSimulationTabs();
 initAssistant();
+initCalcButtonLayoutState();
 
 // Initialize theme on page load
 initTheme();
